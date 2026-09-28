@@ -2,7 +2,7 @@
 
 Este registro distingue las comprobaciones ejecutadas de las verificaciones aún pendientes. No es una certificación de funcionamiento en producción.
 
-## Entorno utilizado
+## Entorno inicial
 
 - Linux con OpenJDK **21.0.11** y `javac` con destino Java 21.
 - Pantalla virtual Xvfb para construir y capturar las ventanas Swing.
@@ -11,7 +11,7 @@ Este registro distingue las comprobaciones ejecutadas de las verificaciones aún
 
 El renderizador y las herramientas del entorno no forman parte del código del prototipo. Se entregan fuentes editables y PNG. No se han distribuido archivos de fuentes tipográficas.
 
-## Ejecutado
+## Comprobaciones iniciales entregadas
 
 | Comprobación | Evidencia | Resultado |
 |---|---|---|
@@ -19,7 +19,9 @@ El renderizador y las herramientas del entorno no forman parte del código del p
 | 28 comprobaciones unitarias | `pruebas_unitarias.txt` | 28 aprobadas; cero fallidas. |
 | Construcción y controles básicos de interfaz | `pruebas_interfaz.txt` | Tres aprobadas; cero fallidas. |
 | Sintaxis y renderizado de once diagramas | `renderizado_plantuml.txt` y PNG en `diagramas/` | Sin errores de sintaxis; PNG nativos de PlantUML. |
-| Coherencia de archivos | Revisión de rutas e inventario | Once imágenes referenciadas por el informe, ocho tablas coincidentes con las entidades del ER, JSON/XML legibles. |
+| Coherencia de archivos | Revisión inicial de rutas e inventario | El informe inicial referenciaba once imágenes; se comprobaron ocho tablas coincidentes con las entidades del ER y archivos JSON/XML legibles. |
+
+El informe compacto actual incorpora nueve diagramas: casos de uso, dominio, estados de solicitud y asistencia, clases de diseño, tres secuencias y entidad-relación. Las once fuentes y sus PNG permanecen en `diagramas/`; actividad y despliegue se conservan como material complementario. Esta selección documental no modifica las comprobaciones iniciales registradas.
 
 ### Capturas de interfaz
 
@@ -42,16 +44,16 @@ El código y la documentación se encuentran en la [rama master del repositorio]
 | Verificación | Preparación entregada | Motivo del estado pendiente |
 |---|---|---|
 | Circuito completo de persistencia MySQL | Scripts 01–03, configuración y README. | La base local, la conexión y el login fueron comprobados; faltan los recorridos completos. |
-| I01–I17 | `PruebasIntegracion.java`, compilado. | Requiere MySQL real y datos iniciales. |
+| I01–I17 | `PruebasIntegracion.java`, compilado. | La base local está preparada; aún no se ejecutó el programa completo de integración. |
 | Q01–Q10 | `04_operaciones_y_consultas.sql`. | No se ejecutó contra el motor MySQL. |
 | BD01–BD05 | `05_pruebas_integridad.sql`. | No se ejecutó contra el motor MySQL. |
-| PP01–PP03 desde Swing | Sección 7.3 del informe y recorridos del README. | Falta ejecución completa con base conectada. |
+| PP01–PP03 desde Swing | [Sección 7.1](../informe/BATTAGINI-GABRIEL-ALEJANDRO-AP2.md#71-casos-y-procedimientos-de-prueba) del informe y recorridos del README. | Falta ejecución completa con base conectada. |
 | Aceptación, carga, concurrencia y rendimiento | Criterios descritos en el informe. | No hubo usuarios validadores ni un entorno representativo. |
 
 No se utilizaron SQLite, MariaDB, una base simulada ni resultados inventados para sustituir una prueba MySQL. La validación estática de nombres, tipos y scripts no equivale a ejecutar el esquema en el motor.
 
 ## Cómo completar el registro
 
-Después de ejecutar cada prueba, conservar su salida, la versión del motor y los datos necesarios para reproducirla. Si falla, registrar el caso, los pasos, el resultado esperado, lo obtenido, la severidad y la corrección realizada. Repetir las pruebas después del ajuste y actualizar la sección 7.4 del informe con esos resultados reales.
+Después de ejecutar cada prueba, conservar su salida, la versión del motor y los datos necesarios para reproducirla. Si falla, registrar el caso, los pasos, el resultado esperado, lo obtenido, la severidad y la corrección realizada. Repetir las pruebas después del ajuste y actualizar la [sección 7.2](../informe/BATTAGINI-GABRIEL-ALEJANDRO-AP2.md#72-registro-de-ejecución-de-esta-versión) del informe con esos resultados reales.
 
 Las evidencias iniciales no deben reinterpretarse como una aprobación global del prototipo.

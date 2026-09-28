@@ -6,8 +6,8 @@ Proyecto académico de **Gabriel Alejandro Battagini**, Seminario de Práctica d
 
 | Carpeta o archivo | Contenido |
 |---|---|
-| `informe/BATTAGINI-GABRIEL-ALEJANDRO-AP2.md` | Informe: continuidad, PUD, análisis, diseño, base de datos, implementación, pruebas, comunicación y trazabilidad. |
-| `diagramas/` | Once fuentes PlantUML y sus once PNG, renderizados nativamente. |
+| [informe/BATTAGINI-GABRIEL-ALEJANDRO-AP2.md](informe/BATTAGINI-GABRIEL-ALEJANDRO-AP2.md) | Informe compacto alineado con `TP_2_Temp_3.docx`, con índice general: continuidad, PUD, análisis, diseño, base de datos, implementación, pruebas, comunicación y conclusión. |
+| `diagramas/` | Once fuentes PlantUML y sus once PNG. El informe incorpora nueve; los diagramas de actividad y despliegue se conservan como material complementario. |
 | `sql/` | Estructura completa, datos iniciales, usuario de conexión, operaciones, consultas y pruebas negativas. |
 | `src/main/java/` | Código de la aplicación. |
 | `src/test/java/` | Comprobaciones unitarias, pruebas con MySQL y comprobaciones básicas de Swing. |
@@ -15,7 +15,7 @@ Proyecto académico de **Gabriel Alejandro Battagini**, Seminario de Práctica d
 | `config/db.properties.example` | Ejemplo de configuración, sin una contraseña real. |
 | `pom.xml`, `.vscode/` | Dependencias y configuración para abrir el proyecto en VS Code. |
 
-**Estado de verificación:** fuentes compiladas con Java 21; 28 comprobaciones unitarias y tres de construcción de interfaz aprobadas. **La integración con MySQL no fue ejecutada en el entorno de elaboración.** El código no se presenta como validado para producción. Consultar `evidencias/ESTADO_VERIFICACION.md`.
+**Estado de verificación:** fuentes compiladas con Java 21; 28 comprobaciones unitarias y tres controles básicos de construcción de interfaz aprobados. También se comprobaron la preparación de la base local, la conexión JDBC cifrada y un inicio de sesión. **I01–I17, Q01–Q10, BD01–BD05, los recorridos completos desde Swing y la aceptación continúan pendientes.** Los resultados y sus límites se detallan en la [sección 7.2](informe/BATTAGINI-GABRIEL-ALEJANDRO-AP2.md#72-registro-de-ejecución-de-esta-versión) del informe y en [evidencias/ESTADO_VERIFICACION.md](evidencias/ESTADO_VERIFICACION.md).
 
 **Verificación local adicional (28/09/2026):** en macOS, con Java 21.0.8 y Maven 3.9.16, `mvn test` compiló el proyecto y aprobó las 28 comprobaciones. Se ejecutaron los scripts 01–03 sobre MySQL 9.6.0 y se verificaron la conexión JDBC cifrada y el ingreso con `atencion1`. El entorno previsto sigue siendo MySQL 8.4; las pruebas completas I01–I17 y los recorridos manuales con persistencia continúan pendientes.
 
@@ -160,13 +160,13 @@ Ejecutar `sql/04_operaciones_y_consultas.sql` con una cuenta administradora de l
 
 En `sql/05_pruebas_integridad.sql`, ejecutar **cada bloque por separado**, incluyendo su `ROLLBACK`. Cada bloque negativo debe producir el rechazo indicado; el error esperado no es una falla del prototipo. Registrar los resultados obtenidos de BD01–BD05.
 
-Completar además PP01–PP03 del informe desde Swing, tomando capturas de datos realmente persistidos. Las capturas ya incluidas son solo evidencia de construcción de ventanas sin conexión.
+Completar además PP01–PP03 de la [sección 7.1](informe/BATTAGINI-GABRIEL-ALEJANDRO-AP2.md#71-casos-y-procedimientos-de-prueba) del informe desde Swing y registrar sus resultados. Las tres capturas originales (`01_login_swing.png`, `02_solicitudes_swing.png` y `03_asistencias_swing.png`) solo evidencian construcción de ventanas sin conexión. Si se incorporan capturas de los recorridos, deben mostrar datos realmente persistidos.
 
 ### Comprobaciones visuales automatizadas
 
 `PruebasInterfaz` construye ventanas, comprueba tres condiciones de componentes/permisos y genera capturas sin abrir la base. Puede ejecutarse desde VS Code como una clase Java de prueba; requiere un entorno gráfico. No es una prueba de uso completo ni sustituye las pruebas manuales con MySQL.
 
-En el entorno de elaboración se ejecutó en una pantalla virtual Xvfb. La compilación y las comprobaciones entregadas se realizaron con `javac` y `java`; **no se ejecutó Maven en ese entorno**.
+Las evidencias iniciales se obtuvieron en Linux, con `javac`, `java` y una pantalla virtual Xvfb, sin Maven. La verificación local adicional del 28/09/2026 sí utilizó Maven en macOS y repitió las tres comprobaciones de interfaz sin MySQL; esas capturas se generaron en un directorio temporal y se conservaron las originales de `evidencias/`.
 
 ## 8. Regenerar los diagramas
 
@@ -179,13 +179,13 @@ java -Djava.awt.headless=true -jar /ruta/plantuml.jar -charset UTF-8 -checkonly 
 java -Djava.awt.headless=true -jar /ruta/plantuml.jar -charset UTF-8 -tpng "diagramas/*.puml"
 ```
 
-El paquete registra la versión utilizada en `evidencias/ESTADO_VERIFICACION.md`. Algunas versiones del renderizador pueden cambiar ligeramente la distribución, sin modificar el modelo.
+El paquete registra la versión utilizada en [evidencias/ESTADO_VERIFICACION.md](evidencias/ESTADO_VERIFICACION.md). Algunas versiones del renderizador pueden cambiar ligeramente la distribución, sin modificar el modelo.
 
 ## 9. Preparar la entrega
 
 El informe usa rutas relativas `../diagramas/` desde la carpeta `informe`. Mantener esa estructura al abrirlo o convertirlo; mover únicamente el MD a otra carpeta rompe sus imágenes.
 
-Antes de entregar: ejecutar las pruebas pendientes, actualizar sus resultados reales en la sección 7.4, incorporar capturas de los recorridos y comprobar que el enlace permita acceder al código. La organización local incluye un `.gitignore` para excluir credenciales y archivos de compilación.
+Antes de declarar validado el incremento, ejecutar las pruebas pendientes y actualizar sus resultados reales en la [sección 7.2](informe/BATTAGINI-GABRIEL-ALEJANDRO-AP2.md#72-registro-de-ejecución-de-esta-versión) del informe. Para la entrega, comprobar también que el enlace permita acceder al código. El informe conserva nueve diagramas y documenta explícitamente las verificaciones pendientes; las imágenes complementarias siguen disponibles en el repositorio. La organización local incluye un `.gitignore` para excluir credenciales y archivos de compilación.
 
 Repositorio del proyecto: **[seminario_practica_informatica_gestion_tecnica — rama master](https://github.com/gabrielbatta/seminario_practica_informatica_gestion_tecnica/tree/master)**. El proyecto se encuentra en la raíz de `master`, junto con el PDF del TP1 conservado del historial anterior. Para descargar esta versión:
 
