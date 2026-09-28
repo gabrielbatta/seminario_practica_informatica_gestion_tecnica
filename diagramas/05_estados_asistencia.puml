@@ -1,0 +1,29 @@
+@startuml 05_estados_asistencia
+skinparam monochrome true
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam dpi 170
+skinparam roundcorner 0
+skinparam classAttributeIconSize 0
+skinparam nodesep 30
+skinparam ranksep 35
+hide circle
+hide empty description
+state "PENDIENTE" as P
+state "PROGRAMADA" as G
+state "FINALIZADA" as F
+[*] --> P : derivar solicitud
+P --> P : completar solo fecha o técnico
+P --> G : fecha y técnico disponibles
+G --> G : reprogramar / reasignar\n[sin intervención registrada]
+G --> G : guardar diagnóstico o tareas\n[técnico asignado]
+G --> F : finalizar [visita realizada, no futura,\ndiagnóstico, tareas y resultado completos]
+F --> [*]
+note bottom of F
+  Resultado = RESUELTO o PENDIENTE.
+  El estado FINALIZADA no decide por sí solo
+  el cierre de la solicitud.
+end note
+@enduml

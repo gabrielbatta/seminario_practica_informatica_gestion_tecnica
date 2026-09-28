@@ -1,0 +1,4 @@
+UI01 | APROBADA | construcción y permisos visuales
+UI02 | APROBADA | construcción y permisos visuales
+UI03 | APROBADA | construcción y permisos visuales
+RESUMEN | aprobadas=3 | fallidas=0 | sin conexión a MySQL

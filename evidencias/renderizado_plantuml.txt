@@ -1,0 +1,21 @@
+RENDERIZACION NATIVA PLANTUML - TP2
+PlantUML version 1.2026.9beta4 / a5eb2c2 [2026-09-27 21:10:41 UTC]
+(GPL source distribution)
+
+Build Version: 1.2026.9beta4
+Git Commit: a5eb2c2
+Compile Time: 2026-09-27 21:10:41 UTC
+
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+
+PLANTUML_LIMIT_SIZE: 4096
+
+GraphViz: dot - graphviz version 2.42.4 (0)
+Installation seems OK. File generation OK
+Comprobacion de sintaxis:
+RESULTADO: 11 fuentes comprobadas, sin errores
+Salida PNG: 11 diagramas generados con el motor PlantUML

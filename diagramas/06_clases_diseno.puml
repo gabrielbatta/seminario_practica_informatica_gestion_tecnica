@@ -1,0 +1,98 @@
+@startuml 06_clases_diseno
+skinparam monochrome true
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam dpi 170
+skinparam roundcorner 0
+skinparam classAttributeIconSize 0
+skinparam nodesep 15
+skinparam ranksep 25
+hide circle
+top to bottom direction
+skinparam defaultFontSize 12
+class VentanaPrincipal <<interfaz Swing>> {
+  -usuario: Usuario
+  +recargar()
+  -nuevaSolicitud()
+  -registrarRemota()
+  -finalizar()
+}
+class SolicitudServicio <<negocio>> {
+  +registrar(...): int
+  +registrarAtencionRemota(...)
+  +derivar(...): int
+  +consultarHistorial(...): String
+}
+class AsistenciaServicio <<negocio>> {
+  +programar(...)
+  +asignarTecnico(...)
+  +registrarDiagnostico(...)
+  +registrarTareas(...)
+  +finalizar(...)
+}
+class ReglasAtencion <<validación>> {
+  +validarRol(...)
+  +validarDerivacion(...)
+  +validarFinalizacion(...)
+}
+class SolicitudDAO <<persistencia>> {
+  +insertar(...): int
+  +buscar(...): Solicitud
+  +cambiarEstado(...)
+  +cerrar(...)
+}
+class AsistenciaDAO <<persistencia>> {
+  +insertar(...): int
+  +buscar(...): Asistencia
+  +guardarProgramacion(...)
+  +finalizar(...)
+}
+class AtencionRemotaDAO <<persistencia>> {
+ +insertar(...)
+}
+class ActividadDAO <<persistencia>> {
+ +registrar(...)
+ +consultarHistorialServicio(...): String
+}
+class ConexionBD <<configuración>> {
+ {static} +abrir(): Connection
+}
+class Solicitud <<datos>> {
+ -id: int
+ -servicioId: int
+ -descripcion: String
+ -estado: String
+ -fechaCierre: LocalDateTime
+}
+class Asistencia <<datos>> {
+ -id: int
+ -solicitudId: int
+ -tecnicoId: Integer
+ -estado: String
+ -diagnostico: String
+ -tareas: String
+ -resultado: String
+}
+VentanaPrincipal --> SolicitudServicio
+VentanaPrincipal --> AsistenciaServicio
+SolicitudServicio ..> ReglasAtencion
+AsistenciaServicio ..> ReglasAtencion
+SolicitudServicio --> SolicitudDAO
+SolicitudServicio --> AtencionRemotaDAO
+SolicitudServicio --> AsistenciaDAO
+SolicitudServicio --> ActividadDAO
+AsistenciaServicio --> AsistenciaDAO
+AsistenciaServicio --> SolicitudDAO
+AsistenciaServicio --> ActividadDAO
+SolicitudServicio ..> ConexionBD
+AsistenciaServicio ..> ConexionBD
+SolicitudDAO ..> Solicitud
+AsistenciaDAO ..> Asistencia
+legend bottom
+  Vista resumida; nombres coincidentes con el código.
+  Se omiten accesores y parámetros extensos.
+  Cada servicio comparte una conexión entre sus DAO.
+endlegend
+@enduml

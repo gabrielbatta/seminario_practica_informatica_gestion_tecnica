@@ -1,0 +1,37 @@
+@startuml 11_despliegue_comunicacion
+skinparam monochrome true
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam dpi 170
+skinparam roundcorner 0
+skinparam classAttributeIconSize 0
+skinparam nodesep 30
+skinparam ranksep 35
+hide circle
+left to right direction
+node "Equipo de escritorio\nEntorno local del prototipo" as PC {
+  node "JVM / Java 21" {
+    artifact "Aplicación Swing\nPresentación + negocio + DAO" as App
+    component "Connector/J\nImplementación de JDBC" as Driver
+  }
+  database "MySQL 8.4\ngestion_tecnica\nInnoDB" as DB
+}
+App --> Driver : llamadas JDBC
+Driver --> DB : protocolo MySQL sobre TCP/IP\n127.0.0.1:3306 + TLS
+note bottom of PC
+  Prototipo: aplicación y base en el mismo equipo.
+  No requiere red física para tráfico de loopback.
+  VS Code es el entorno de desarrollo, no un servidor.
+end note
+node "Alternativa de despliegue\nServidor de base de datos en LAN" as LAN {
+  database "MySQL\nAcceso restringido" as DBA
+}
+Driver ..> DBA : propuesta, no implementada\nEthernet / IPv4 / TCP 3306 / TLS
+note bottom of LAN
+  Firewall, usuarios de mínimo privilegio,
+  certificado validado y copias de seguridad.
+  No publicar MySQL directamente en Internet.
+end note
+@enduml

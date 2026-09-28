@@ -1,0 +1,111 @@
+@startuml 10_entidad_relacion
+skinparam monochrome true
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam dpi 170
+skinparam roundcorner 0
+skinparam classAttributeIconSize 0
+skinparam nodesep 30
+skinparam ranksep 35
+hide circle
+top to bottom direction
+skinparam linetype ortho
+skinparam defaultFontSize 12
+hide methods
+entity cliente {
+ * id_cliente : INT <<PK>>
+ --
+ * nombre : VARCHAR(100)
+ * telefono : VARCHAR(30)
+}
+entity domicilio {
+ * id_domicilio : INT <<PK>>
+ --
+ * id_cliente : INT <<FK>>
+ * direccion : VARCHAR(150)
+ * localidad : VARCHAR(80)
+}
+entity servicio {
+ * id_servicio : INT <<PK>>
+ --
+ * id_domicilio : INT <<FK>>
+ * codigo : VARCHAR(30) <<UQ>>
+ * tipo : VARCHAR(20)
+ * activo : BOOLEAN
+}
+entity usuario {
+ * id_usuario : INT <<PK>>
+ --
+ * nombre : VARCHAR(100)
+ * login : VARCHAR(40) <<UQ>>
+ * clave_hash : VARCHAR(200)
+ * rol : VARCHAR(20)
+ * activo : BOOLEAN
+}
+entity solicitud {
+ * id_solicitud : INT <<PK>>
+ --
+ * id_servicio : INT <<FK>>
+ * id_usuario_registro : INT <<FK>>
+ * fecha_registro : DATETIME
+ * descripcion : VARCHAR(1000)
+ * estado : VARCHAR(30)
+ fecha_cierre : DATETIME
+ canal_cierre : VARCHAR(20)
+ solucion_cierre : VARCHAR(2000)
+}
+entity atencion_remota {
+ * id_atencion : INT <<PK>>
+ --
+ * id_solicitud : INT <<FK>>
+ * id_usuario : INT <<FK>>
+ * fecha : DATETIME
+ * diagnostico : VARCHAR(2000)
+ * acciones : VARCHAR(2000)
+ * resultado : VARCHAR(15)
+ solucion : VARCHAR(2000)
+}
+entity asistencia {
+ * id_asistencia : INT <<PK>>
+ --
+ * id_solicitud : INT <<FK>>
+ id_tecnico : INT <<FK>>
+ * motivo : VARCHAR(1000)
+ fecha_programada : DATETIME
+ * estado : VARCHAR(20)
+ diagnostico : VARCHAR(2000)
+ tareas : VARCHAR(2000)
+ resultado : VARCHAR(15)
+ detalle_resultado : VARCHAR(2000)
+ fecha_finalizacion : DATETIME
+}
+entity registro_actividad {
+ * id_registro : INT <<PK>>
+ --
+ * id_solicitud : INT <<FK>>
+ * id_usuario : INT <<FK>>
+ * fecha : DATETIME
+ * operacion : VARCHAR(50)
+ * detalle : VARCHAR(2000)
+}
+cliente ||--o{ domicilio
+domicilio ||--o{ servicio
+servicio ||--o{ solicitud
+usuario ||--o{ solicitud
+solicitud ||--o{ atencion_remota
+solicitud ||--o{ asistencia
+solicitud ||--o{ registro_actividad
+usuario ||--o{ atencion_remota
+usuario |o--o{ asistencia
+usuario ||--o{ registro_actividad
+cliente -[hidden]right- usuario
+atencion_remota -[hidden]right- asistencia
+asistencia -[hidden]right- registro_actividad
+legend bottom
+  * = NOT NULL. PK = clave primaria. FK = clave foránea. UQ = valor único.
+  Las ocho tablas coinciden con 01_estructura.sql; restricciones CHECK en el script.
+  Las claves foráneas impiden borrar registros referenciados por otras tablas.
+endlegend
+@enduml

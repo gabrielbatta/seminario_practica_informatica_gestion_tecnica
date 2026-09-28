@@ -1,0 +1,7 @@
+{
+    "version": "0.2.0",
+    "configurations": [{
+        "type": "java", "name": "Ejecutar Gestión Técnica", "request": "launch",
+        "mainClass": "ar.edu.gestiontecnica.Main", "cwd": "${workspaceFolder}"
+    }]
+}

@@ -1,0 +1,70 @@
+@startuml 01_casos_de_uso
+skinparam monochrome true
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam dpi 170
+skinparam roundcorner 0
+skinparam classAttributeIconSize 0
+skinparam nodesep 30
+skinparam ranksep 35
+hide circle
+left to right direction
+actor "Operador de\natención" as OA
+actor "Soporte\ntécnico" as ST
+actor "Coordinador\ntécnico" as CO
+actor "Técnico\nde campo" as TC
+actor Administrador as AD
+rectangle "Sistema de Gestión y Seguimiento de Asistencias Técnicas" {
+  usecase "CU01\nRegistrar solicitud técnica" as U1
+  usecase "CU02\nConsultar solicitud" as U2
+  usecase "CU03\nRegistrar diagnóstico remoto" as U3
+  usecase "CU04\nRegistrar resolución remota" as U4
+  usecase "CU05\nDerivar a asistencia domiciliaria" as U5
+  usecase "CU06\nProgramar o reprogramar asistencia" as U6
+  usecase "CU07\nAsignar técnico" as U7
+  usecase "CU08\nConsultar asistencias asignadas" as U8
+  usecase "CU09\nRegistrar diagnóstico presencial" as U9
+  usecase "CU10\nRegistrar intervención realizada" as U10
+  usecase "CU11\nFinalizar asistencia y registrar resultado" as U11
+  usecase "CU12\nConsultar historial técnico" as U12
+  usecase "CU13\nGestionar usuarios\n[Iteración posterior]" as U13
+  usecase "CU14\nRegistrar y consultar datos básicos\n[Consulta y precarga en TP2; alta posterior]" as U14
+  U1 -[hidden]right- U6
+  U2 -[hidden]right- U7
+  U3 -[hidden]right- U8
+  U4 -[hidden]right- U9
+  U5 -[hidden]right- U10
+  U12 -[hidden]right- U11
+  U14 -[hidden]right- U13
+}
+OA -- U1
+OA -- U2
+OA -- U12
+OA -- U14
+ST -- U2
+ST -- U3
+ST -- U4
+ST -- U5
+ST -- U12
+U2 -- CO
+U6 -- CO
+U7 -- CO
+U8 -- TC
+U9 -- TC
+U10 -- TC
+U11 -- TC
+U12 -- TC
+U13 -- AD
+U2 -- AD
+U12 -- AD
+U12 -- CO
+U2 -- TC
+legend bottom
+  Se mantienen los identificadores CU01–CU14 del TP1.
+  Autenticación: precondición común (RNF01).
+  El cliente no opera la aplicación; se comunica con el personal.
+  Coordinador y administrador también disponen de lectura del historial en el prototipo.
+endlegend
+@enduml

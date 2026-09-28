@@ -1,0 +1,29 @@
+U01 | APROBADA | Limpiar espacios de entrada
+U02 | APROBADA | Campo obligatorio vacío
+U03 | APROBADA | Longitud máxima
+U04 | APROBADA | Rol autorizado
+U05 | APROBADA | Rol no autorizado
+U06 | APROBADA | Sin sesión
+U07 | APROBADA | Usuario inactivo
+U08 | APROBADA | Solicitud cerrada
+U09 | APROBADA | Derivación duplicada
+U10 | APROBADA | Derivación sin visita activa
+U11 | APROBADA | Cierre remoto con visita activa
+U12 | APROBADA | Atención remota permitida
+U13 | APROBADA | Sin técnico sigue pendiente
+U14 | APROBADA | Sin fecha sigue pendiente
+U15 | APROBADA | Fecha y técnico programan visita
+U16 | APROBADA | Otro técnico no puede intervenir
+U17 | APROBADA | Finalizar sin diagnóstico
+U18 | APROBADA | Finalizar sin tareas
+U19 | APROBADA | Finalizar sin detalle
+U20 | APROBADA | Resultado fuera del dominio
+U21 | APROBADA | Finalizar visita resuelta
+U22 | APROBADA | Finalizar visita no resuelta
+U23 | APROBADA | No finalizar visita futura
+U24 | APROBADA | No modificar visita finalizada
+U25 | APROBADA | Verificar hash correcto
+U26 | APROBADA | Rechazar otra contraseña
+U27 | APROBADA | Rechazar hash mal formado
+U28 | APROBADA | Sales distintas para la misma contraseña
+RESUMEN | aprobadas=28 | fallidas=0

@@ -1,0 +1,36 @@
+@startuml 04_estados_solicitud
+skinparam monochrome true
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam dpi 170
+skinparam roundcorner 0
+skinparam classAttributeIconSize 0
+skinparam nodesep 30
+skinparam ranksep 35
+hide circle
+hide empty description
+state "REGISTRADA" as R
+state "EN_ATENCION_REMOTA" as E
+state "DERIVADA" as D
+state "PENDIENTE_CONTINUIDAD" as P
+state "CERRADA" as C
+[*] --> R : registrar
+R --> E : atención remota pendiente
+E --> E : nueva atención pendiente
+R --> D : derivar con motivo
+E --> D : derivar con motivo
+R --> C : resolución remota completa
+E --> C : resolución remota completa
+D --> P : visita finalizada / pendiente
+D --> C : visita finalizada / resuelto
+P --> D : nueva asistencia
+P --> E : reanudar atención remota
+P --> C : resolución remota completa
+C --> [*]
+note bottom of C
+  Se conserva para consulta.
+  No se reabre ni se elimina en este prototipo.
+end note
+@enduml

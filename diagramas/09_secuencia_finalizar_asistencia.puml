@@ -1,0 +1,56 @@
+@startuml 09_secuencia_finalizar_asistencia
+skinparam monochrome true
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam dpi 170
+skinparam roundcorner 0
+skinparam classAttributeIconSize 0
+skinparam nodesep 30
+skinparam ranksep 35
+hide circle
+hide footbox
+skinparam maxMessageSize 165
+autonumber
+actor "Técnico asignado" as T
+boundary VentanaPrincipal as V
+control AsistenciaServicio as S
+participant AsistenciaDAO as A
+participant SolicitudDAO as D
+participant ActividadDAO as R
+database MySQL as B
+T -> V : confirmar visita realizada, resultado y detalle
+V -> S : finalizar(usuario, asistenciaId, resultado, detalle)
+S -> S : validar rol y detalle
+S -> B : abrir conexión / setAutoCommit(false)
+S -> A : buscar(conexion, asistenciaId, false)
+A -> B : SELECT asistencia
+B --> A : referencia
+A --> S : solicitudId
+S -> D : buscar(conexion, solicitudId, true)
+D -> B : SELECT solicitud FOR UPDATE
+S -> A : buscar(conexion, asistenciaId, true)
+A -> B : SELECT asistencia FOR UPDATE
+A --> S : asistencia actual
+S -> S : validar solicitud abierta, técnico,\ndiagnóstico, tareas y fecha no futura
+alt validaciones correctas
+  S -> A : finalizar(conexion, id, resultado, detalle)
+  A -> B : UPDATE asistencia: FINALIZADA
+  alt resultado RESUELTO
+    S -> D : cerrar(conexion, solicitudId, DOMICILIARIA, detalle)
+    D -> B : UPDATE solicitud: CERRADA y resolución
+  else resultado PENDIENTE
+    S -> D : cambiarEstado(..., PENDIENTE_CONTINUIDAD)
+    D -> B : UPDATE solicitud: PENDIENTE_CONTINUIDAD
+  end
+  S -> R : registrar(..., FINALIZAR_ASISTENCIA, ...)
+  R -> B : INSERT registro_actividad
+  S -> B : commit()
+  S --> V : operación confirmada
+  V --> T : mostrar resultado y actualizar tablas
+else falta información, permiso o falla SQL
+  S -> B : rollback()
+  S --> V : informar error sin confirmar cambios
+end
+@enduml

@@ -1,0 +1,47 @@
+@startuml 07_secuencia_registrar_solicitud
+skinparam monochrome true
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam dpi 170
+skinparam roundcorner 0
+skinparam classAttributeIconSize 0
+skinparam nodesep 30
+skinparam ranksep 35
+hide circle
+hide footbox
+skinparam maxMessageSize 165
+autonumber
+actor "Operador de atención" as O
+boundary VentanaPrincipal as V
+control SolicitudServicio as S
+participant CatalogoDAO as C
+participant SolicitudDAO as D
+participant ActividadDAO as A
+database MySQL as B
+O -> V : elegir servicio e ingresar inconveniente
+V -> S : registrar(usuario, servicioId, descripcion)
+S -> S : validar rol y descripción
+S -> B : abrir conexión / setAutoCommit(false)
+S -> C : servicioValido(conexion, servicioId)
+C -> B : SELECT servicio, domicilio y contacto
+B --> C : datos
+C --> S : válido / inválido
+alt datos válidos
+  S -> D : insertar(conexion, servicioId, usuarioId, descripcion)
+  D -> B : INSERT solicitud
+  B --> D : ID generado
+  D --> S : solicitudId
+  S -> A : registrar(..., REGISTRAR_SOLICITUD, ...)
+  A -> B : INSERT registro_actividad
+  S -> B : commit()
+  S --> V : solicitudId
+  V --> O : confirmar registro y actualizar tabla
+else servicio inválido o falla de escritura
+  S -> B : rollback()
+  S --> V : informar error
+  V --> O : mostrar mensaje, sin confirmar alta
+end
+note over V,S : JDBC se ejecuta en TareaInterfaz; la actualización visual vuelve al hilo de Swing.
+@enduml

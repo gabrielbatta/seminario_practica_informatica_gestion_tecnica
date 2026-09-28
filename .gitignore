@@ -1,0 +1,7 @@
+# No publicar claves locales, compilados ni archivos de la IDE ajenos al proyecto.
+config/db.properties
+sql/*.local.sql
+target/
+build/
+*.class
+.DS_Store

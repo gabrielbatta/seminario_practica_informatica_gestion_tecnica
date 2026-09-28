@@ -1,0 +1,50 @@
+@startuml 08_secuencia_resolver_remotamente
+skinparam monochrome true
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam dpi 170
+skinparam roundcorner 0
+skinparam classAttributeIconSize 0
+skinparam nodesep 30
+skinparam ranksep 35
+hide circle
+hide footbox
+skinparam maxMessageSize 165
+autonumber
+actor "Soporte técnico" as O
+boundary VentanaPrincipal as V
+control SolicitudServicio as S
+participant SolicitudDAO as D
+participant AsistenciaDAO as D2
+participant AtencionRemotaDAO as R
+participant ActividadDAO as A
+database MySQL as B
+O -> V : completar diagnóstico, acciones y solución
+V -> S : registrarAtencionRemota(..., RESUELTO, solucion)
+S -> S : validar rol y campos obligatorios
+S -> B : abrir conexión / setAutoCommit(false)
+S -> D : buscar(conexion, id, true)
+D -> B : SELECT solicitud FOR UPDATE
+B --> D : solicitud
+D --> S : solicitud
+S -> D2 : existeActiva(conexion, id)
+D2 -> B : SELECT asistencia activa
+B --> D2 : existencia de visita
+D2 --> S : activa / no activa
+alt solicitud abierta y sin visita activa
+  S -> R : insertar(..., RESUELTO, solucion)
+  R -> B : INSERT atencion_remota
+  S -> D : cerrar(conexion, id, REMOTA, solucion)
+  D -> B : UPDATE solicitud: CERRADA, fecha y solución
+  S -> A : registrar(..., CERRAR_REMOTAMENTE, ...)
+  A -> B : INSERT registro_actividad
+  S -> B : commit()
+  S --> V : operación confirmada
+  V --> O : atención registrada / solicitud cerrada
+else estado no permitido o error de escritura
+  S -> B : rollback()
+  S --> V : error de validación o persistencia
+end
+@enduml

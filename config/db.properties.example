@@ -1,0 +1,6 @@
+# Copiar como config/db.properties y completar la clave elegida en la copia 03_usuario_bd.local.sql.
+# Este ejemplo requiere TLS en MySQL. REQUIRED cifra, pero NO verifica la identidad.
+# Para una LAN real usar VERIFY_IDENTITY y configurar el certificado de confianza.
+db.url=jdbc:mysql://127.0.0.1:3306/gestion_tecnica?sslMode=REQUIRED&connectTimeout=5000&socketTimeout=10000&connectionTimeZone=LOCAL
+db.usuario=gt_app
+db.clave=CAMBIAR_CLAVE_LOCAL

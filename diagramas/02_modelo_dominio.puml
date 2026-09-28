@@ -1,0 +1,79 @@
+@startuml 02_modelo_dominio
+skinparam monochrome true
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam dpi 170
+skinparam roundcorner 0
+skinparam classAttributeIconSize 0
+skinparam nodesep 30
+skinparam ranksep 35
+hide circle
+top to bottom direction
+hide methods
+class Cliente {
+ nombre
+ teléfono
+}
+class Domicilio {
+ dirección
+ localidad
+}
+class Servicio {
+ código
+ tipo
+ activo
+}
+class "Solicitud técnica" as Solicitud {
+ número
+ fecha de registro
+ inconveniente
+ estado
+ resolución de cierre
+}
+class "Atención remota" as Remota {
+ fecha
+ diagnóstico
+ acciones
+ resultado
+ solución
+}
+class "Asistencia domiciliaria" as Visita {
+ motivo
+ fecha programada
+ estado
+ diagnóstico
+ tareas
+ resultado
+}
+class Usuario {
+ nombre
+ rol
+}
+class "Registro de actividad" as Registro {
+ fecha
+ operación
+ detalle
+}
+Cliente "1" -- "0..*" Domicilio : tiene
+Domicilio "1" -- "0..*" Servicio : dispone de
+Servicio "1" -- "0..*" Solicitud : recibe
+Solicitud "1" -- "0..*" Remota : se atiende mediante
+Solicitud "1" -- "0..*" Visita : puede requerir
+Solicitud "1" -- "1..*" Registro : conserva
+Usuario "1" -- "0..*" Remota : documenta
+Usuario "0..1" -- "0..*" Visita : técnico asignado
+Usuario "1" -- "0..*" Registro : realiza
+Remota -[hidden]right- Visita
+Visita -[hidden]right- Registro
+note bottom of Usuario
+ Los roles no son personas distintas por herencia.
+ Un usuario del prototipo tiene un único rol.
+end note
+legend bottom
+  Conceptos de negocio, no tablas ni clases de interfaz.
+  El primer registro de actividad se crea junto con la solicitud.
+  Una visita puede estar pendiente sin técnico; para realizarla requiere uno.
+endlegend
+@enduml

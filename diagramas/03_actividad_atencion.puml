@@ -1,0 +1,46 @@
+@startuml 03_actividad_atencion
+skinparam monochrome true
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam dpi 170
+skinparam roundcorner 0
+skinparam classAttributeIconSize 0
+skinparam nodesep 30
+skinparam ranksep 35
+hide circle
+start
+:Operador: identificar cliente y servicio;
+:Registrar solicitud e inconveniente;
+:Soporte: evaluar la solicitud;
+if (¿Se intenta atención remota?) then (sí)
+  :Documentar diagnóstico y acciones;
+  if (¿Problema resuelto?) then (sí)
+    :Registrar solución y cerrar solicitud;
+    :Conservar historial;
+    stop
+  endif
+endif
+repeat
+  :Soporte: registrar motivo de derivación;
+  :Crear asistencia y marcar solicitud DERIVADA;
+  :Coordinador: programar fecha y asignar técnico;
+  :Técnico: realizar visita;
+  :Registrar diagnóstico, tareas y resultado;
+  :Finalizar asistencia realizada;
+  if (¿Problema resuelto?) then (sí)
+    :Cerrar solicitud con resolución domiciliaria;
+    :Conservar historial;
+    stop
+  else (no)
+    :Solicitud PENDIENTE_CONTINUIDAD;
+  endif
+repeat while (¿Requiere otra visita?) is (sí) not (no)
+:Continuar atención remota o mantener pendiente;
+stop
+legend bottom
+  Una visita no realizada se reprograma; no se finaliza como realizada.
+  El final del diagrama puede representar atención pendiente, no cierre del incidente.
+endlegend
+@enduml
