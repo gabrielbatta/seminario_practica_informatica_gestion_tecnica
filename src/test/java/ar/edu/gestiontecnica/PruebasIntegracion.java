@@ -23,11 +23,11 @@ public class PruebasIntegracion {
             }
         }
         AutenticacionServicio login = new AutenticacionServicio();
-        Usuario operador = login.ingresar("atencion1", "DemoTP2!2026".toCharArray());
-        Usuario soporte = login.ingresar("soporte1", "DemoTP2!2026".toCharArray());
-        Usuario coordinador = login.ingresar("coordinador1", "DemoTP2!2026".toCharArray());
-        Usuario tecnico = login.ingresar("tecnico1", "DemoTP2!2026".toCharArray());
-        Usuario otroTecnico = login.ingresar("tecnico2", "DemoTP2!2026".toCharArray());
+        Usuario operador = login.ingresar("atencion1", "1234".toCharArray());
+        Usuario soporte = login.ingresar("soporte1", "1234".toCharArray());
+        Usuario coordinador = login.ingresar("coordinador1", "1234".toCharArray());
+        Usuario tecnico = login.ingresar("tecnico1", "1234".toCharArray());
+        Usuario otroTecnico = login.ingresar("tecnico2", "1234".toCharArray());
         ok("I01", "Autenticación de los roles", operador.getId() == 1 && tecnico.getId() == 4);
         try {
             login.ingresar("' OR '1'='1", "cualquiera".toCharArray());

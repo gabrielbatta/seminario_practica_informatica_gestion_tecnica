@@ -1,81 +1,72 @@
-# TP2 — Gestión y seguimiento de asistencias técnicas
+# TP3 - Gestión y seguimiento de asistencias técnicas
 
-Proyecto académico de **Gabriel Alejandro Battagini**, Seminario de Práctica de Informática, Universidad Siglo 21. Interfaz de escritorio **Java Swing**, lógica separada de los DAO y persistencia prevista en **MySQL 8.4**.
+Prototipo académico de **Gabriel Alejandro Battagini**, Seminario de Práctica de Informática, Universidad Siglo 21. Aplicación de escritorio en **Java 21 y Swing**, con reglas de negocio separadas de los DAO y persistencia en **MySQL**.
 
-## 1. Qué contiene la entrega
+## Funciones del prototipo
 
-| Carpeta o archivo | Contenido |
+- Ingreso con usuario y contraseña; permisos según el rol.
+- Registro de solicitudes para clientes y servicios precargados.
+- Atención remota, con diagnóstico, acciones y resolución o continuidad.
+- Derivación a domicilio, programación y asignación de técnico.
+- Registro de diagnóstico y tareas, y finalización de cada visita.
+- Consulta de solicitudes, asistencias, historial y actividad por responsable.
+
+**Finalizar una visita como PENDIENTE mantiene la solicitud abierta.** Una segunda intervención puede resolverla y cerrarla, conservando las dos visitas en el historial.
+
+La administración gráfica de usuarios, clientes y servicios queda fuera de esta iteración. Esos datos se cargan mediante SQL. El administrador dispone de consultas; cada técnico consulta e interviene únicamente dentro de los permisos establecidos.
+
+## Estructura
+
+| Ruta | Contenido |
 |---|---|
-| [informe/BATTAGINI-GABRIEL-ALEJANDRO-AP2.md](informe/BATTAGINI-GABRIEL-ALEJANDRO-AP2.md) | Informe compacto alineado con `TP_2_Temp_3.docx`, con índice general: continuidad, PUD, análisis, diseño, base de datos, implementación, pruebas, comunicación y conclusión. |
-| `diagramas/` | Once fuentes PlantUML y sus once PNG. El informe incorpora nueve; los diagramas de actividad y despliegue se conservan como material complementario. |
-| `sql/` | Estructura completa, datos iniciales, usuario de conexión, operaciones, consultas y pruebas negativas. |
-| `src/main/java/` | Código de la aplicación. |
-| `src/test/java/` | Comprobaciones unitarias, pruebas con MySQL y comprobaciones básicas de Swing. |
-| `evidencias/` | Resultados reales de lo ejecutado, capturas de construcción de ventanas y estado de verificación. |
-| `config/db.properties.example` | Ejemplo de configuración, sin una contraseña real. |
-| `pom.xml`, `.vscode/` | Dependencias y configuración para abrir el proyecto en VS Code. |
+| `src/main/java/` | Aplicación: interfaz, servicios, DAO, modelos y conexión. |
+| `src/test/java/` | Comprobaciones existentes: unitarias, integración y construcción de ventanas. |
+| `sql/` | Estructura, datos iniciales, cuenta de conexión, operaciones y controles de integridad. |
+| `config/db.properties.example` | Plantilla de conexión sin credenciales locales reales. |
+| `pom.xml` | Compilación Java 21, Connector/J y ejecución con Maven. |
 
-**Estado de verificación:** fuentes compiladas con Java 21; 28 comprobaciones unitarias y tres controles básicos de construcción de interfaz aprobados. También se comprobaron la preparación de la base local, la conexión JDBC cifrada y un inicio de sesión. **I01–I17, Q01–Q10, BD01–BD05, los recorridos completos desde Swing y la aceptación continúan pendientes.** Los resultados y sus límites se detallan en la [sección 7.2](informe/BATTAGINI-GABRIEL-ALEJANDRO-AP2.md#72-registro-de-ejecución-de-esta-versión) del informe y en [evidencias/ESTADO_VERIFICACION.md](evidencias/ESTADO_VERIFICACION.md).
+## Requisitos
 
-**Verificación local adicional (28/09/2026):** en macOS, con Java 21.0.8 y Maven 3.9.16, `mvn test` compiló el proyecto y aprobó las 28 comprobaciones. Se ejecutaron los scripts 01–03 sobre MySQL 9.6.0 y se verificaron la conexión JDBC cifrada y el ingreso con `atencion1`. El entorno previsto sigue siendo MySQL 8.4; las pruebas completas I01–I17 y los recorridos manuales con persistencia continúan pendientes.
+- JDK 21.
+- Maven 3.9.x.
+- Servidor MySQL. El entorno previsto es MySQL 8.4 y la verificación local se realizó en MySQL 9.6.0.
+- Entorno gráfico para abrir Swing. Puede desarrollarse en VS Code con Extension Pack for Java.
 
-## 2. Preparación del entorno
+El proyecto utiliza `mysql-connector-j:8.4.0`, descargado por Maven. Abrir la carpeta completa que contiene `pom.xml`.
 
-Utilizar un **JDK 21**, **MySQL Community Server 8.4**, VS Code y **Extension Pack for Java**. La carpeta `.vscode` contiene la recomendación de extensión. Abrir la **carpeta completa que contiene `pom.xml`**, no únicamente un archivo `.java`.
+## Preparación inicial
 
-El proyecto declara `com.mysql:mysql-connector-j:8.4.0`. VS Code/Maven deben descargar esa dependencia. La primera preparación requiere acceso a los repositorios de dependencias; la aplicación no consume un servicio de Internet para gestionar las solicitudes.
-
-Para usar los comandos de este README se necesita Maven 3.9.x instalado y disponible como `mvn`. Verificar en la terminal:
+Clonar el repositorio y entrar en su carpeta:
 
 ```bash
-java -version
-javac -version
-mvn -version
+git clone --branch master https://github.com/gabrielbatta/seminario_practica_informatica_gestion_tecnica.git
+cd seminario_practica_informatica_gestion_tecnica
 ```
 
-Este paquete **no incluye** JDK, servidor MySQL, Maven, Connector/J ni el renderizador de PlantUML. Los PNG ya están generados y no requieren instalar PlantUML para leer el informe.
+Los siguientes pasos corresponden a una **base de práctica nueva**. Los scripts 01 y 02 se ejecutan una sola vez; no deben repetirse sobre la base ya preparada.
 
-Los scripts utilizan características y la intercalación de MySQL 8.4. No sustituirlo silenciosamente por MariaDB; por ejemplo, una instalación de XAMPP puede incluir otro motor.
-
-## 3. Crear la base de práctica
-
-Trabajar sobre una instalación o base de práctica, no sobre datos de producción. Los scripts no ejecutan `DROP DATABASE` ni eliminan tablas. La estructura y la carga inicial están pensadas para ejecutarse **una vez sobre una base nueva**.
-
-Desde la raíz del proyecto, abrir un cliente SQL con una cuenta administradora. Por ejemplo:
+Abrir MySQL con una cuenta administradora:
 
 ```bash
 mysql -u root -p
 ```
 
-En el cliente MySQL, ejecutar en este orden:
+Ejecutar desde la raíz del proyecto:
 
 ```sql
 SOURCE sql/01_estructura.sql;
 SOURCE sql/02_datos_iniciales.sql;
 ```
 
-Antes del tercer script, **copiar** `sql/03_usuario_bd.sql` como `sql/03_usuario_bd.local.sql`. En esa copia, reemplazar `CAMBIAR_CLAVE_LOCAL` por una contraseña local propia. La copia `*.local.sql` está excluida de Git; mantener el archivo original con su marcador, sin una clave real. Utilizar una clave que no contenga una comilla simple para no alterar el literal SQL, o escaparla correctamente. Luego ejecutar:
+Copiar `sql/03_usuario_bd.sql` como `sql/03_usuario_bd.local.sql`. En la copia, reemplazar `CAMBIAR_CLAVE_LOCAL` por una contraseña propia para la cuenta de conexión `gt_app`; respetar el escape de literales SQL si contiene comillas. Ejecutar esa copia:
 
 ```sql
 SOURCE sql/03_usuario_bd.local.sql;
 ```
 
-La cuenta creada es `gt_app` para conexiones locales, exige SSL y no tiene permiso de borrado ni de modificación de estructura. **No usar `root` como cuenta de conexión de la aplicación.** Si ya existe `gt_app`, revisar esa cuenta de forma explícita; el script no sobrescribe automáticamente usuarios existentes.
+El script crea una cuenta local con SSL y permisos limitados. Si `gt_app` ya existe, revisar su configuración antes de ejecutar el script.
 
-Comprobar estructura y datos iniciales:
-
-```sql
-USE gestion_tecnica;
-SHOW TABLES;
-SELECT id_servicio, codigo, tipo FROM servicio;
-SELECT id_usuario, login, rol FROM usuario;
-```
-
-Debe haber ocho tablas, tres servicios y seis usuarios de aplicación. Si se produce un error durante la preparación, detenerse y revisar el mensaje antes de continuar; no ocultarlo ejecutando todos los scripts repetidamente.
-
-## 4. Configurar la conexión
-
-Copiar `config/db.properties.example` como **`config/db.properties`** y colocar la misma contraseña elegida para `gt_app`.
+Copiar `config/db.properties.example` como `config/db.properties` y completar la misma contraseña elegida para `gt_app`:
 
 ```properties
 db.url=jdbc:mysql://127.0.0.1:3306/gestion_tecnica?sslMode=REQUIRED&connectTimeout=5000&socketTimeout=10000&connectionTimeZone=LOCAL
@@ -83,119 +74,63 @@ db.usuario=gt_app
 db.clave=COLOCAR_AQUI_LA_CLAVE_LOCAL
 ```
 
-La contraseña anterior es un marcador, no una credencial que se haya creado. `.gitignore` excluye `config/db.properties`. No publicar ese archivo, la copia `03_usuario_bd.local.sql` ni contraseñas locales.
+La cuenta de conexión `gt_app` es diferente de los usuarios de la aplicación. `config/db.properties` y los scripts `*.local.sql` están excluidos de Git. La configuración mostrada corresponde a MySQL y la aplicación en el mismo equipo; `sslMode=REQUIRED` cifra la conexión sin verificar la identidad del servidor.
 
-La configuración de ejemplo es para aplicación y MySQL en el mismo equipo. `sslMode=REQUIRED` exige cifrado, pero no verifica la identidad del servidor; para red interna real se debe configurar `VERIFY_IDENTITY`, certificados y reglas de acceso. No habilitar el puerto de MySQL hacia Internet para esta práctica.
+## Levantar la aplicación
 
-El programa lee este archivo desde la raíz del proyecto. Una ubicación alternativa puede indicarse con la propiedad Java `-Dgt.config=/ruta/db.properties`. Las fechas se interpretan como hora local del equipo; mantener la misma zona horaria en los puestos que compartan la base.
-
-## 5. Ejecutar la aplicación
-
-En VS Code, esperar a que termine la importación del proyecto Java/Maven. Abrir `src/main/java/ar/edu/gestiontecnica/Main.java` y usar **Run**, o elegir la configuración **Ejecutar Gestión Técnica** de `.vscode/launch.json`.
-
-Desde una terminal ubicada en la raíz también se puede utilizar:
+Con MySQL iniciado, ejecutar desde la raíz del proyecto:
 
 ```bash
 mvn compile exec:java "-Dexec.cleanupDaemonThreads=false"
 ```
 
-Se muestra la ventana de acceso. Las siguientes son **cuentas ficticias de aplicación**, distintas de la cuenta de conexión `gt_app`:
+Se abre la ventana de acceso. Para detener la ejecución desde la terminal, usar **Ctrl+C**. También puede iniciarse `ar.edu.gestiontecnica.Main` desde el IDE.
+
+La aplicación lee `config/db.properties` desde el directorio de trabajo. Una ubicación alternativa puede indicarse con `-Dgt.config=/ruta/db.properties`.
+
+## Cuentas de demostración
+
+**Contraseña de las seis cuentas: `1234`.** Son datos ficticios de práctica. El script inicial conserva hashes PBKDF2 con una sal diferente por cuenta.
 
 | Usuario | Rol |
 |---|---|
-| `atencion1` | Operador de atención |
-| `soporte1` | Soporte técnico |
-| `coordinador1` | Coordinación |
-| `tecnico1` | Técnico de campo 1 |
-| `tecnico2` | Técnico de campo 2 |
-| `admin1` | Administrador: consultas de revisión en este prototipo |
+| `atencion1` | Registro de solicitudes. |
+| `soporte1` | Atención remota y derivación. |
+| `coordinador1` | Programación y asignación de visitas. |
+| `tecnico1` | Diagnóstico, tareas y finalización de sus visitas. |
+| `tecnico2` | Segundo técnico para verificar el aislamiento de asignaciones. |
+| `admin1` | Consultas de revisión. |
 
-**Contraseña de demostración para las seis cuentas: `DemoTP2!2026`.** Está documentada deliberadamente porque son datos de prueba. Los hashes se encuentran en el script inicial; no usar estas credenciales ni esta carga en producción.
+## Recorridos manuales
 
-Si la aplicación informa un error de conexión, revisar servicio MySQL iniciado, configuración, contraseña, SSL y disponibilidad de Connector/J. El mensaje no equivale a una operación guardada. La consola conserva el detalle técnico del error.
+1. **Resolución remota:** registrar una solicitud con atención; ingresar con soporte, cargar diagnóstico y acciones, elegir RESUELTO y completar la solución. Comprobar el cierre sin visita domiciliaria.
+2. **Continuidad domiciliaria:** registrar otra solicitud, derivarla, programar una visita y asignar técnico. Guardar diagnóstico y tareas y finalizar como PENDIENTE. Derivar nuevamente la misma solicitud y resolverla en otra visita. Comprobar que el historial conserva ambas.
+3. **Permisos y validaciones:** comprobar campos obligatorios, restricciones por rol y que `tecnico2` no pueda intervenir sobre las visitas de `tecnico1`.
 
-## 6. Demostrar los dos recorridos
+Las fechas se ingresan como `dd/MM/aaaa HH:mm`. Para registrar una visita realizada, utilizar una fecha anterior o igual al momento actual; no se permite finalizar una visita futura. Diagnóstico y tareas se guardan mediante sus acciones separadas.
 
-### A. Resolución remota
+## Comprobaciones existentes
 
-Con `atencion1`, usar **Nueva solicitud**, seleccionar un servicio y registrar un inconveniente. Anotar el identificador creado; no asumir que siempre será 1. Cerrar sesión e ingresar con `soporte1`. Seleccionar la solicitud, registrar diagnóstico, acciones y resultado `RESUELTO`, completar la solución y confirmar. Consultar **Historial**: la solicitud debe quedar cerrada, con sus antecedentes, sin generar una visita.
+No se agregaron nuevas pruebas para esta revisión. Las credenciales de la comprobación de integración existente se actualizaron a `1234`.
 
-### B. Visita sin resolución y segunda intervención
-
-Registrar otra solicitud con atención. Con soporte, usar **Derivar**, completar el motivo y confirmar. Con coordinación, abrir **Asistencias**, seleccionar la visita, programar fecha/hora y asignar `tecnico1`. Se pueden cargar ambos datos en cualquier orden; solo con ambos queda programada.
-
-Para la demostración de una visita ya realizada, usar una fecha anterior o igual al momento de registro. No se permite finalizar una visita futura. Las fechas se ingresan como `dd/MM/aaaa HH:mm`.
-
-Con `tecnico1`, guardar el diagnóstico y las tareas mediante sus botones separados. Usar **Finalizar**, elegir `PENDIENTE`, detallar qué falta y confirmar que la visita se realizó. La asistencia debe finalizar y la solicitud permanecer pendiente de continuidad.
-
-Con soporte, derivar nuevamente **la misma solicitud**; con coordinación, programar y asignar la nueva visita; con el técnico, completar su intervención y finalizar como `RESUELTO`. Consultar el historial y comprobar que conserva ambas visitas. Esta diferencia entre visita y solicitud es el ajuste de RF17.
-
-`tecnico2` no debe visualizar las asignaciones de `tecnico1`. La cuenta `admin1` no sustituye los permisos de operación de los demás roles: en esta iteración solo dispone de consultas. La administración completa de usuarios no está implementada.
-
-## 7. Ejecutar y registrar las pruebas
-
-### Unitarias, sin MySQL
+Unitarias, sin MySQL:
 
 ```bash
 mvn test
 ```
 
-El objetivo `test` está configurado para ejecutar `PruebasUnitarias`, un programa de comprobaciones explícitas sin JUnit. Debe informar 28 aprobadas y cero fallidas; cualquier incumplimiento lanza un error. También puede ejecutarse esa clase desde VS Code. No requiere `db.properties`.
+Este objetivo ejecuta `PruebasUnitarias`, un programa de 28 comprobaciones explícitas sin JUnit.
 
-### Integración, con MySQL real
-
-Después de preparar los scripts y la conexión:
+Integración, con una base de práctica preparada:
 
 ```bash
 mvn test-compile exec:java "-Dexec.mainClass=ar.edu.gestiontecnica.PruebasIntegracion" "-Dexec.classpathScope=test" "-Dexec.args=--confirmar-base-pruebas"
 ```
 
-El argumento de confirmación es obligatorio. El programa comprueba el motor, utiliza las cuentas ficticias y crea solicitudes con la marca `PRUEBA_TP2`. **Agrega datos y conserva sus historiales**: no los borra después. Ejecutarlo únicamente en una base de práctica.
+La integración agrega solicitudes identificadas como `PRUEBA_TP2` y conserva sus historiales. Esa marca pertenece al programa existente. Ejecutarla únicamente en la base de práctica.
 
-Comprobar el resultado real de I01–I17. Guardar la salida y la versión del motor en `evidencias/`, sin copiar un resultado esperado como si hubiera ocurrido. El programa termina con error si una comprobación falla; los datos creados antes del fallo pueden permanecer para su revisión.
+`sql/04_operaciones_y_consultas.sql` contiene Q01-Q10. Q01-Q03 insertan, modifican y eliminan solamente un cliente temporal sin relaciones; las demás consultas recuperan información del circuito. `sql/05_pruebas_integridad.sql` contiene cinco bloques negativos: ejecutarlos individualmente, incluyendo cada `ROLLBACK`.
 
-### Integridad y consultas SQL
+`PruebasInterfaz` realiza tres comprobaciones de construcción de ventanas; requiere entorno gráfico y no sustituye los recorridos completos con MySQL.
 
-Ejecutar `sql/04_operaciones_y_consultas.sql` con una cuenta administradora de la base de práctica. Q01–Q03 insertan, modifican y borran **solo un cliente temporal sin relaciones**; las demás consultas leen la información del circuito. Algunas consultas devolverán cero filas hasta que se hayan creado solicitudes y visitas.
-
-En `sql/05_pruebas_integridad.sql`, ejecutar **cada bloque por separado**, incluyendo su `ROLLBACK`. Cada bloque negativo debe producir el rechazo indicado; el error esperado no es una falla del prototipo. Registrar los resultados obtenidos de BD01–BD05.
-
-Completar además PP01–PP03 de la [sección 7.1](informe/BATTAGINI-GABRIEL-ALEJANDRO-AP2.md#71-casos-y-procedimientos-de-prueba) del informe desde Swing y registrar sus resultados. Las tres capturas originales (`01_login_swing.png`, `02_solicitudes_swing.png` y `03_asistencias_swing.png`) solo evidencian construcción de ventanas sin conexión. Si se incorporan capturas de los recorridos, deben mostrar datos realmente persistidos.
-
-### Comprobaciones visuales automatizadas
-
-`PruebasInterfaz` construye ventanas, comprueba tres condiciones de componentes/permisos y genera capturas sin abrir la base. Puede ejecutarse desde VS Code como una clase Java de prueba; requiere un entorno gráfico. No es una prueba de uso completo ni sustituye las pruebas manuales con MySQL.
-
-Las evidencias iniciales se obtuvieron en Linux, con `javac`, `java` y una pantalla virtual Xvfb, sin Maven. La verificación local adicional del 28/09/2026 sí utilizó Maven en macOS y repitió las tres comprobaciones de interfaz sin MySQL; esas capturas se generaron en un directorio temporal y se conservaron las originales de `evidencias/`.
-
-## 8. Regenerar los diagramas
-
-Cada PNG se obtiene de su `.puml` homónimo, sin pasos manuales de dibujo. Todos son PlantUML real; no hay vistas previas de Graphviz usadas como sustituto. El renderizador puede utilizar Graphviz internamente para distribuir los elementos, lo cual forma parte del proceso normal.
-
-Con un `plantuml.jar` instalado localmente, desde la raíz:
-
-```bash
-java -Djava.awt.headless=true -jar /ruta/plantuml.jar -charset UTF-8 -checkonly "diagramas/*.puml"
-java -Djava.awt.headless=true -jar /ruta/plantuml.jar -charset UTF-8 -tpng "diagramas/*.puml"
-```
-
-El paquete registra la versión utilizada en [evidencias/ESTADO_VERIFICACION.md](evidencias/ESTADO_VERIFICACION.md). Algunas versiones del renderizador pueden cambiar ligeramente la distribución, sin modificar el modelo.
-
-## 9. Preparar la entrega
-
-El informe usa rutas relativas `../diagramas/` desde la carpeta `informe`. Mantener esa estructura al abrirlo o convertirlo; mover únicamente el MD a otra carpeta rompe sus imágenes.
-
-Antes de declarar validado el incremento, ejecutar las pruebas pendientes y actualizar sus resultados reales en la [sección 7.2](informe/BATTAGINI-GABRIEL-ALEJANDRO-AP2.md#72-registro-de-ejecución-de-esta-versión) del informe. Para la entrega, comprobar también que el enlace permita acceder al código. El informe conserva nueve diagramas y documenta explícitamente las verificaciones pendientes; las imágenes complementarias siguen disponibles en el repositorio. La organización local incluye un `.gitignore` para excluir credenciales y archivos de compilación.
-
-Repositorio del proyecto: **[seminario_practica_informatica_gestion_tecnica — rama master](https://github.com/gabrielbatta/seminario_practica_informatica_gestion_tecnica/tree/master)**. El proyecto se encuentra en la raíz de `master`, junto con el PDF del TP1 conservado del historial anterior. Para descargar esta versión:
-
-```bash
-git clone --branch master https://github.com/gabrielbatta/seminario_practica_informatica_gestion_tecnica.git
-cd seminario_practica_informatica_gestion_tecnica
-```
-
-La configuración `config/db.properties` y el script `sql/03_usuario_bd.local.sql` son archivos locales excluidos de Git; cada instalación debe prepararlos según las secciones 3 y 4.
-
-Convertir el informe a PDF con **A4, Calibri 11, espaciado simple y portada**. Ajustar los diagramas al ancho de página y revisar que sus textos sean legibles; cuando sea necesario dedicar una página al diagrama. Nombre final: **`BATTAGINI-GABRIEL-ALEJANDRO-AP2.PDF`**.
-
-Las referencias académicas se utilizan para organización y continuidad; las decisiones propias del prototipo están diferenciadas. No se atribuyen entrevistas, pruebas de aceptación ni mediciones de rendimiento que no se hayan realizado.
+**Verificación local registrada:** 28 comprobaciones unitarias, 17 de integración y cinco de integridad aprobadas; Q01-Q10 ejecutadas. Después del cambio de contraseña se verificó el acceso de las seis cuentas con `1234`. Los procedimientos PP01-PP03 siguen pendientes de ejecución íntegra desde los formularios; las consultas y validaciones gráficas parciales no equivalen a su aprobación.
