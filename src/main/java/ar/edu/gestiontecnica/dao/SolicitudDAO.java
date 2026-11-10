@@ -55,27 +55,21 @@ public class SolicitudDAO {
         }
     }
 
-    public List<Solicitud> listar(Connection conexion, Usuario usuario, String filtro) throws SQLException {
+    public List<Solicitud> listar(Connection conexion, Usuario usuario) throws SQLException {
         String sql = """
             SELECT s.*, c.nombre AS cliente, d.direccion AS domicilio, v.codigo AS servicio
             FROM solicitud s
             INNER JOIN servicio v ON v.id_servicio = s.id_servicio
             INNER JOIN domicilio d ON d.id_domicilio = v.id_domicilio
             INNER JOIN cliente c ON c.id_cliente = d.id_cliente
-            WHERE (c.nombre LIKE ? OR v.codigo LIKE ? OR CAST(s.id_solicitud AS CHAR) LIKE ?)
             """;
         boolean esTecnico = "TECNICO".equals(usuario.getRol());
         if (esTecnico) {
-            sql += " AND EXISTS (SELECT 1 FROM asistencia a WHERE a.id_solicitud = s.id_solicitud AND a.id_tecnico = ?)";
+            sql += " WHERE EXISTS (SELECT 1 FROM asistencia a WHERE a.id_solicitud = s.id_solicitud AND a.id_tecnico = ?)";
         }
-        sql += " ORDER BY s.id_solicitud DESC";
         List<Solicitud> solicitudes = new ArrayList<>();
         try (PreparedStatement sentencia = conexion.prepareStatement(sql)) {
-            String texto = "%" + filtro.trim() + "%";
-            sentencia.setString(1, texto);
-            sentencia.setString(2, texto);
-            sentencia.setString(3, texto);
-            if (esTecnico) { sentencia.setInt(4, usuario.getId()); }
+            if (esTecnico) { sentencia.setInt(1, usuario.getId()); }
             try (ResultSet filas = sentencia.executeQuery()) {
                 while (filas.next()) {
                     Solicitud solicitud = leer(filas);

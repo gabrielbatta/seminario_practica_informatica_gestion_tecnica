@@ -4,28 +4,21 @@ import java.time.LocalDateTime;
 
 // Objeto sencillo para transportar los datos entre las capas.
 // Los nombres de cliente/servicio se consultan con JOIN; no se duplican en las tablas.
-public class Asistencia {
-    private int id;
+public class Asistencia extends RegistroAtencion {
     private int solicitudId;
     private Integer tecnicoId;
     private String motivo;
     private LocalDateTime fechaProgramada;
-    private String estado;
     private String diagnostico;
     private String tareas;
     private String resultado;
     private String detalleResultado;
     private LocalDateTime fechaFinalizacion;
     private String nombreTecnico;
-    private String cliente;
-    private String servicio;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    @Override
+    public String getReferencia() {
+        return "Asistencia #" + getId() + " · Solicitud #" + solicitudId;
     }
 
     public int getSolicitudId() {
@@ -58,14 +51,6 @@ public class Asistencia {
 
     public void setFechaProgramada(LocalDateTime fechaProgramada) {
         this.fechaProgramada = fechaProgramada;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
     }
 
     public String getDiagnostico() {
@@ -116,19 +101,4 @@ public class Asistencia {
         this.nombreTecnico = nombreTecnico;
     }
 
-    public String getCliente() {
-        return cliente;
-    }
-
-    public void setCliente(String cliente) {
-        this.cliente = cliente;
-    }
-
-    public String getServicio() {
-        return servicio;
-    }
-
-    public void setServicio(String servicio) {
-        this.servicio = servicio;
-    }
 }

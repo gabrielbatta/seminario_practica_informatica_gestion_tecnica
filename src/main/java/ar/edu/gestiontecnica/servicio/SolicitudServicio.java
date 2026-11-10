@@ -23,7 +23,7 @@ public class SolicitudServicio {
             try {
                 // 2. Verificar que el servicio y sus datos de contacto existan.
                 if (!catalogoDAO.servicioValido(conexion, servicioId)) {
-                    throw new IllegalArgumentException("El servicio no existe, está inactivo o le faltan datos de contacto.");
+                    throw new ReglaNegocioException("El servicio no existe, está inactivo o le faltan datos de contacto.");
                 }
                 // 3. Guardar solicitud y actividad como una sola operación.
                 int id = solicitudDAO.insertar(conexion, servicioId, usuario.getId(), problema);
@@ -85,7 +85,7 @@ public class SolicitudServicio {
                 boolean visitaActiva = asistenciaDAO.existeActiva(conexion, solicitudId);
                 ReglasAtencion.validarDerivacion(solicitud, visitaActiva);
                 if (!catalogoDAO.servicioValido(conexion, solicitud.getServicioId())) {
-                    throw new IllegalArgumentException("Revisar el domicilio, el contacto y el servicio antes de derivar.");
+                    throw new ReglaNegocioException("Revisar el domicilio, el contacto y el servicio antes de derivar.");
                 }
                 int asistenciaId = asistenciaDAO.insertar(conexion, solicitudId, motivoValidado);
                 solicitudDAO.cambiarEstado(conexion, solicitudId, "DERIVADA");
@@ -103,7 +103,7 @@ public class SolicitudServicio {
     public List<Solicitud> listar(Usuario usuario, String filtro) throws SQLException {
         ReglasAtencion.validarRol(usuario, "ATENCION", "SOPORTE", "COORDINADOR", "TECNICO", "ADMINISTRADOR");
         try (Connection conexion = ConexionBD.abrir()) {
-            return solicitudDAO.listar(conexion, usuario, filtro);
+            return ConsultaSolicitudes.buscarYOrdenar(solicitudDAO.listar(conexion, usuario), filtro);
         }
     }
 
@@ -116,10 +116,10 @@ public class SolicitudServicio {
         ReglasAtencion.validarRol(usuario, "ATENCION", "SOPORTE", "COORDINADOR", "TECNICO", "ADMINISTRADOR");
         try (Connection conexion = ConexionBD.abrir()) {
             Solicitud solicitud = solicitudDAO.buscar(conexion, solicitudId, false);
-            if (solicitud == null) { throw new IllegalArgumentException("La solicitud no existe."); }
+            if (solicitud == null) { throw new ReglaNegocioException("La solicitud no existe."); }
             if ("TECNICO".equals(usuario.getRol())
                     && !solicitudDAO.tecnicoPuedeConsultar(conexion, solicitud.getServicioId(), usuario.getId())) {
-                throw new IllegalArgumentException("No tiene asistencias asignadas sobre este servicio.");
+                throw new AccesoDenegadoException("No tiene asistencias asignadas sobre este servicio.");
             }
             return actividadDAO.consultarHistorialServicio(conexion, solicitud.getServicioId());
         }

@@ -1,0 +1,117 @@
+@startuml 14_entidad_relacion
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 16
+skinparam classFontSize 17
+skinparam classAttributeIconSize 0
+skinparam dpi 200
+skinparam roundcorner 0
+skinparam nodesep 35
+skinparam ranksep 45
+skinparam ArrowColor #555555
+skinparam classBorderColor #555555
+skinparam classBackgroundColor #FAFAFA
+skinparam packageBorderColor #9C9C9C
+skinparam packageBackgroundColor #F5F5F5
+skinparam noteBackgroundColor #F8F8F8
+skinparam noteBorderColor #A8A8A8
+skinparam legendBackgroundColor #FAFAFA
+hide circle
+title Diseño TP3 · MySQL: ocho tablas y tipos SQL completos
+top to bottom direction
+hide methods
+entity cliente {
+  {field} * id_cliente : INT <<PK>> {AI}
+  {field} * nombre : VARCHAR(100)
+  {field} * telefono : VARCHAR(30)
+}
+entity domicilio {
+  {field} * id_domicilio : INT <<PK>> {AI}
+  {field} * id_cliente : INT <<FK>>
+  {field} * direccion : VARCHAR(150)
+  {field} * localidad : VARCHAR(80)
+}
+entity servicio {
+  {field} * id_servicio : INT <<PK>> {AI}
+  {field} * id_domicilio : INT <<FK>>
+  {field} * codigo : VARCHAR(30) <<UQ>>
+  {field} * tipo : VARCHAR(20)
+  {field} * activo : BOOLEAN
+}
+entity usuario {
+  {field} * id_usuario : INT <<PK>> {AI}
+  {field} * nombre : VARCHAR(100)
+  {field} * login : VARCHAR(40) <<UQ>>
+  {field} * clave_hash : VARCHAR(200)
+  {field} * rol : VARCHAR(20)
+  {field} * activo : BOOLEAN
+}
+entity solicitud {
+  {field} * id_solicitud : INT <<PK>> {AI}
+  {field} * id_servicio : INT <<FK>>
+  {field} * id_usuario_registro : INT <<FK>>
+  {field} * fecha_registro : DATETIME
+  {field} * descripcion : VARCHAR(1000)
+  {field} * estado : VARCHAR(30)
+  {field}   fecha_cierre : DATETIME
+  {field}   canal_cierre : VARCHAR(20)
+  {field}   solucion_cierre : VARCHAR(2000)
+}
+entity atencion_remota {
+  {field} * id_atencion : INT <<PK>> {AI}
+  {field} * id_solicitud : INT <<FK>>
+  {field} * id_usuario : INT <<FK>>
+  {field} * fecha : DATETIME
+  {field} * diagnostico : VARCHAR(2000)
+  {field} * acciones : VARCHAR(2000)
+  {field} * resultado : VARCHAR(15)
+  {field}   solucion : VARCHAR(2000)
+}
+entity asistencia {
+  {field} * id_asistencia : INT <<PK>> {AI}
+  {field} * id_solicitud : INT <<FK>>
+  {field}   id_tecnico : INT <<FK>>
+  {field} * motivo : VARCHAR(1000)
+  {field}   fecha_programada : DATETIME
+  {field} * estado : VARCHAR(20)
+  {field}   diagnostico : VARCHAR(2000)
+  {field}   tareas : VARCHAR(2000)
+  {field}   resultado : VARCHAR(15)
+  {field}   detalle_resultado : VARCHAR(2000)
+  {field}   fecha_finalizacion : DATETIME
+}
+entity registro_actividad {
+  {field} * id_registro : INT <<PK>> {AI}
+  {field} * id_solicitud : INT <<FK>>
+  {field} * id_usuario : INT <<FK>>
+  {field} * fecha : DATETIME
+  {field} * operacion : VARCHAR(50)
+  {field} * detalle : VARCHAR(2000)
+}
+
+cliente ||--o{ domicilio : id_cliente
+domicilio ||--o{ servicio : id_domicilio
+servicio ||--o{ solicitud : id_servicio
+usuario ||--o{ solicitud : id_usuario_registro
+solicitud ||--o{ atencion_remota : id_solicitud
+solicitud ||--o{ asistencia : id_solicitud
+solicitud ||--o{ registro_actividad : id_solicitud
+usuario ||--o{ atencion_remota : id_usuario
+usuario |o--o{ asistencia : id_tecnico
+usuario ||--o{ registro_actividad : id_usuario
+cliente -[hidden]right- usuario
+atencion_remota -[hidden]right- asistencia
+asistencia -[hidden]right- registro_actividad
+
+legend bottom
+Tipos declarados exactamente en sql/01_estructura.sql. * = NOT NULL; sin * = admite NULL.
+PK = clave primaria; FK = clave foránea; UQ = único; AI = AUTO_INCREMENT.
+|| = exactamente uno; |o = cero o uno; o{ = cero o muchos. Las ocho tablas son InnoDB/utf8mb4.
+MySQL admite BOOLEAN como alias de TINYINT(1); se conserva aquí el tipo declarado en el script.
+Las FK restringen el borrado. CHECK e índices se documentan en el script; no se representan como atributos.
+La regla «máximo una visita activa» se aplica transaccionalmente en los servicios, no mediante una FK.
+endlegend
+@enduml

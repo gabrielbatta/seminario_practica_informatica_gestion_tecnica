@@ -26,7 +26,7 @@ public class AsistenciaServicio {
     public void programar(Usuario usuario, int asistenciaId, LocalDateTime fecha) throws SQLException {
         // CU06: se permite cargar fechas pasadas para documentar visitas ya realizadas.
         ReglasAtencion.validarRol(usuario, "COORDINADOR");
-        if (fecha == null) { throw new IllegalArgumentException("Completar la fecha y hora de la visita."); }
+        if (fecha == null) { throw new ReglaNegocioException("Completar la fecha y hora de la visita."); }
         try (Connection conexion = ConexionBD.abrir()) {
             conexion.setAutoCommit(false);
             try {
@@ -56,7 +56,7 @@ public class AsistenciaServicio {
                 validarSinIntervencion(asistencia);
                 Usuario tecnico = new UsuarioDAO().buscarPorId(conexion, tecnicoId);
                 if (tecnico == null || !tecnico.getActivo() || !"TECNICO".equals(tecnico.getRol())) {
-                    throw new IllegalArgumentException("Seleccionar un técnico activo.");
+                    throw new ReglaNegocioException("Seleccionar un técnico activo.");
                 }
                 Integer anterior = asistencia.getTecnicoId();
                 asistencia.setTecnicoId(tecnicoId);
@@ -144,7 +144,7 @@ public class AsistenciaServicio {
     private Asistencia cargarParaModificar(Connection conexion, int asistenciaId) throws SQLException {
         // Orden de bloqueo común: primero la solicitud y después la asistencia.
         Asistencia referencia = asistenciaDAO.buscar(conexion, asistenciaId, false);
-        if (referencia == null) { throw new IllegalArgumentException("La asistencia no existe."); }
+        if (referencia == null) { throw new ReglaNegocioException("La asistencia no existe."); }
         Solicitud solicitud = solicitudDAO.buscar(conexion, referencia.getSolicitudId(), true);
         ReglasAtencion.validarSolicitudAbierta(solicitud);
         Asistencia asistencia = asistenciaDAO.buscar(conexion, asistenciaId, true);
@@ -154,7 +154,7 @@ public class AsistenciaServicio {
 
     private void validarSinIntervencion(Asistencia asistencia) {
         if (asistencia.getDiagnostico() != null || asistencia.getTareas() != null) {
-            throw new IllegalArgumentException("No se puede reprogramar o reasignar una visita con intervención registrada.");
+            throw new ReglaNegocioException("No se puede reprogramar o reasignar una visita con intervención registrada.");
         }
     }
 }

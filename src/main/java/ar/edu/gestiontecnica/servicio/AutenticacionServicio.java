@@ -10,12 +10,12 @@ import java.security.GeneralSecurityException;
 public class AutenticacionServicio {
     public Usuario ingresar(String login, char[] clave) throws SQLException, GeneralSecurityException {
         String nombre = ReglasAtencion.textoObligatorio(login, "el usuario", 40);
-        if (clave == null || clave.length == 0) { throw new IllegalArgumentException("Completar la contraseña."); }
+        if (clave == null || clave.length == 0) { throw new ReglaNegocioException("Completar la contraseña."); }
         try (Connection conexion = ConexionBD.abrir()) {
             Usuario usuario = new UsuarioDAO().buscarPorLogin(conexion, nombre);
             if (usuario == null || !usuario.getActivo()
                     || !SeguridadClave.verificar(clave, usuario.getClaveHash())) {
-                throw new IllegalArgumentException("Usuario o contraseña incorrectos.");
+                throw new AccesoDenegadoException("Usuario o contraseña incorrectos.");
             }
             // No conservar el hash en la sesión de la pantalla.
             usuario.setClaveHash(null);

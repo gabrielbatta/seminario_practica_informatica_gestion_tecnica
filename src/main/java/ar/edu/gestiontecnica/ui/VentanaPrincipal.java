@@ -30,10 +30,22 @@ public class VentanaPrincipal extends JFrame {
     private List<Opcion> opcionesTecnicos = new ArrayList<>();
 
     public VentanaPrincipal(Usuario usuario) {
-        super("Gestión Técnica | Solicitudes y asistencias");
+        this(usuario, null);
+    }
+
+    public VentanaPrincipal(Usuario usuario, GraphicsConfiguration pantalla) {
+        super("Gestión Técnica | Solicitudes y asistencias", pantalla);
         this.usuario = usuario;
+        filtro.setName("filtroSolicitudes");
+        estadoCarga.setName("estadoCarga");
+        tablaSolicitudes.setName("tablaSolicitudes");
+        tablaAsistencias.setName("tablaAsistencias");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1140, 650); setMinimumSize(new Dimension(960, 560)); setLocationRelativeTo(null);
+        setSize(1140, 650); setMinimumSize(new Dimension(960, 560));
+        Rectangle limites = getGraphicsConfiguration().getBounds();
+        Insets margenes = Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
+        setLocation(limites.x + margenes.left + Math.max(0, (limites.width - margenes.left - margenes.right - getWidth()) / 2),
+                limites.y + margenes.top + Math.max(0, (limites.height - margenes.top - margenes.bottom - getHeight()) / 2));
         JPanel principal = new JPanel(new BorderLayout(12, 12));
         principal.setBorder(BorderFactory.createEmptyBorder(16, 16, 12, 16));
         JPanel cabecera = new JPanel(new BorderLayout());
@@ -43,7 +55,11 @@ public class VentanaPrincipal extends JFrame {
         JPanel sesion = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         sesion.add(new JLabel(usuario.getNombre() + " · " + usuario.getRol()));
         JButton salir = new JButton("Cerrar sesión");
-        salir.addActionListener(evento -> { dispose(); new VentanaLogin().setVisible(true); });
+        salir.addActionListener(evento -> {
+            VentanaLogin acceso = new VentanaLogin(getGraphicsConfiguration());
+            acceso.setVisible(true);
+            dispose();
+        });
         sesion.add(salir); cabecera.add(sesion, BorderLayout.EAST);
         principal.add(cabecera, BorderLayout.NORTH);
         JTabbedPane pestanas = new JTabbedPane();
@@ -78,7 +94,8 @@ public class VentanaPrincipal extends JFrame {
         JButton derivar = new JButton("Derivar a visita"); derivar.setName("derivar");
         derivar.setEnabled(tieneRol("SOPORTE")); derivar.addActionListener(evento -> derivar());
         JButton historial = new JButton("Historial del servicio");
-        historial.addActionListener(evento -> { Solicitud s = seleccionSolicitud(); if (s != null) { mostrarHistorial(s.getId()); } });
+        historial.setName("historial");
+        historial.addActionListener(evento -> { Solicitud s = seleccionSolicitud(); if (s != null) { mostrarHistorial(s.getId(), s); } });
         botones.add(nueva); botones.add(detalle); botones.add(remota); botones.add(derivar); botones.add(historial);
         panel.add(botones, BorderLayout.SOUTH); return panel;
     }
@@ -101,7 +118,7 @@ public class VentanaPrincipal extends JFrame {
         JButton finalizar = new JButton("Finalizar"); finalizar.setName("finalizar");
         finalizar.setEnabled(tieneRol("TECNICO")); finalizar.addActionListener(evento -> finalizar());
         JButton antecedentes = new JButton("Antecedentes");
-        antecedentes.addActionListener(evento -> { Asistencia a = seleccionAsistencia(); if (a != null) { mostrarHistorial(a.getSolicitudId()); } });
+        antecedentes.addActionListener(evento -> { Asistencia a = seleccionAsistencia(); if (a != null) { mostrarHistorial(a.getSolicitudId(), a); } });
         botones.add(actualizar); botones.add(programar); botones.add(asignar); botones.add(diagnostico);
         botones.add(tareas); botones.add(finalizar); botones.add(antecedentes);
         panel.add(botones, BorderLayout.SOUTH); return panel;
@@ -165,7 +182,7 @@ public class VentanaPrincipal extends JFrame {
 
     private void verSolicitud() {
         Solicitud s = seleccionSolicitud(); if (s == null) { return; }
-        String texto = "Solicitud #" + s.getId() + "\nCliente: " + s.getCliente() + "\nDomicilio: " + s.getDomicilio()
+        String texto = s.getReferencia() + "\nCliente: " + s.getCliente() + "\nDomicilio: " + s.getDomicilio()
                 + "\nServicio: " + s.getServicio() + "\nEstado: " + s.getEstado() + "\n\nInconveniente:\n" + s.getDescripcion();
         if (s.getSolucionCierre() != null) { texto += "\n\nSolución de cierre (" + s.getCanalCierre() + "):\n" + s.getSolucionCierre(); }
         mostrarTexto("Datos de la solicitud", texto);
@@ -264,11 +281,11 @@ public class VentanaPrincipal extends JFrame {
         }.iniciar();
     }
 
-    private void mostrarHistorial(int solicitudId) {
+    private void mostrarHistorial(int solicitudId, RegistroAtencion registro) {
         new TareaInterfaz(this) {
             private String texto;
             @Override protected void realizar() throws Exception { texto = solicitudes.consultarHistorial(usuario, solicitudId); }
-            @Override protected void alFinalizar() { mostrarTexto("Historial técnico del servicio", texto); }
+            @Override protected void alFinalizar() { mostrarTexto("Historial técnico del servicio · " + registro.getReferencia(), texto); }
         }.iniciar();
     }
 

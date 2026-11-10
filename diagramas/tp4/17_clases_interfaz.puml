@@ -1,0 +1,103 @@
+@startuml 17_clases_interfaz
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam classFontSize 15
+skinparam classAttributeIconSize 0
+skinparam dpi 220
+skinparam roundcorner 0
+skinparam nodesep 28
+skinparam ranksep 30
+skinparam ArrowColor #6D6D6D
+skinparam classBorderColor #6D6D6D
+skinparam classBackgroundColor #FAFAFA
+skinparam classBackgroundColor<<contexto>> #FFFFFF
+skinparam classBorderColor<<contexto>> #989898
+skinparam packageBorderColor #AFAFAF
+skinparam packageBackgroundColor white
+hide circle
+hide empty fields
+class VentanaPrincipal {
+  -usuario : Usuario {final}
+  -solicitudes : SolicitudServicio {final}
+  -asistencias : AsistenciaServicio {final}
+  -filtro : JTextField {final}
+  -estadoCarga : JLabel {final}
+  -formatoFecha : DateTimeFormatter {final}
+  -modeloSolicitudes : DefaultTableModel {final}
+  -modeloAsistencias : DefaultTableModel {final}
+  -tablaSolicitudes : JTable {final}
+  -tablaAsistencias : JTable {final}
+  -filasSolicitudes : List<Solicitud>
+  -filasAsistencias : List<Asistencia>
+  -opcionesServicios : List<Opcion>
+  -opcionesTecnicos : List<Opcion>
+  --
+  +VentanaPrincipal(Usuario)
+  +recargar() : void
+  -nuevaSolicitud() : void
+  -finalizar() : void
+  -mostrarHistorial(int, RegistroAtencion) : void
+}
+class VentanaLogin {
+  -usuario : JTextField {final}
+  -clave : JPasswordField {final}
+  -ingresar : JButton {final}
+  --
+  +VentanaLogin()
+  -ingresar() : void
+}
+abstract class TareaInterfaz {
+  -ventana : Window {final}
+  --
+  +TareaInterfaz(Window)
+  #{abstract} realizar() : void
+  #{abstract} alFinalizar() : void
+  #alFallar() : void
+  +iniciar() : void
+  #doInBackground() : Void
+  #done() : void
+}
+class Main {
+  +{static} main(String[]) : void
+}
+
+class "JFrame" as JFrame <<JDK>>
+abstract class "SwingWorker" as SwingWorker <<JDK>>
+class "Usuario" as Usuario <<contexto>>
+class "SolicitudServicio" as SS <<contexto>>
+class "AsistenciaServicio" as AS <<contexto>>
+class "AutenticacionServicio" as Auth <<contexto>>
+package "Tipos de colecciones · vista 1" as Tipos {
+  class "Solicitud" as Solicitud <<contexto>>
+  class "Asistencia" as Asistencia <<contexto>>
+  class "Opcion" as Opcion <<contexto>>
+  Solicitud -[hidden]right- Asistencia
+  Asistencia -[hidden]right- Opcion
+}
+JFrame <|-- VentanaPrincipal
+JFrame <|-- VentanaLogin
+SwingWorker <|-- TareaInterfaz
+Main ..> VentanaLogin : crea en EDT
+VentanaLogin ..> VentanaPrincipal : crea
+VentanaLogin ..> TareaInterfaz : especializa pasos
+VentanaPrincipal ..> TareaInterfaz : especializa pasos
+VentanaPrincipal --> Usuario : sesión
+VentanaPrincipal --> SS
+VentanaPrincipal --> AS
+VentanaPrincipal --> Tipos : listas de objetos
+VentanaLogin ..> Auth : autentica
+VentanaLogin ..> Usuario : recibe sesión
+VentanaPrincipal -[hidden]right- VentanaLogin
+VentanaLogin -[hidden]right- TareaInterfaz
+
+legend bottom
+ + público; - privado; # protegido; cursiva: abstracto.
+ Se conservan los 18 atributos propios de las clases de interfaz.
+ mostrarHistorial recibe Solicitud o Asistencia mediante RegistroAtencion.
+ Las cajas de contexto se desarrollan en las otras vistas.
+endlegend
+@enduml

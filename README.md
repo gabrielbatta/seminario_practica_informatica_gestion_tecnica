@@ -1,4 +1,4 @@
-# TP3 - Gestión y seguimiento de asistencias técnicas
+# TP4 - Gestión y seguimiento de asistencias técnicas
 
 Prototipo académico de **Gabriel Alejandro Battagini**, Seminario de Práctica de Informática, Universidad Siglo 21. Aplicación de escritorio en **Java 21 y Swing**, con reglas de negocio separadas de los DAO y persistencia en **MySQL**.
 
@@ -20,10 +20,25 @@ La administración gráfica de usuarios, clientes y servicios queda fuera de est
 | Ruta | Contenido |
 |---|---|
 | `src/main/java/` | Aplicación: interfaz, servicios, DAO, modelos y conexión. |
-| `src/test/java/` | Comprobaciones existentes: unitarias, integración y construcción de ventanas. |
-| `sql/` | Estructura, datos iniciales, cuenta de conexión, operaciones y controles de integridad. |
+| `sql/` | Estructura, datos iniciales, cuenta de conexión, operaciones y consultas. |
 | `config/db.properties.example` | Plantilla de conexión sin credenciales locales reales. |
 | `pom.xml` | Compilación Java 21, Connector/J y ejecución con Maven. |
+| `diagramas/` | Imágenes de los diagramas y sus fuentes editables. |
+| `evidencias/tp4/` | Resumen de verificación y capturas con datos persistidos. |
+
+## Incremento TP4
+
+Se conserva la organización en capas y se adopta MVC simplificado: las ventanas Swing presentan los datos y reciben los eventos; los modelos y servicios representan los datos y las reglas. Los DAO separan complementariamente la persistencia SQL.
+
+`Solicitud` y `Asistencia` heredan de la clase abstracta `RegistroAtencion`. Ambas redefinen `getReferencia()`, utilizado polimórficamente al consultar el historial. `ReglaNegocioException` comunica validaciones y `AccesoDenegadoException` especializa los rechazos de permisos y autenticación. Los errores JDBC conservan su tipo `SQLException` y provocan rollback cuando hay una transacción activa.
+
+`ConsultaSolicitudes` implementa búsqueda secuencial por cliente, servicio o número y ordenación por inserción, con ID descendente. Emplea `ArrayList` para reunir coincidencias y un arreglo `Solicitud[]` para ordenar. El DAO limita primero los datos según el usuario; la búsqueda Java solo procesa los registros autorizados. La búsqueda ignora mayúsculas y tildes; `%` y `_` se interpretan literalmente. Se mantiene la ordenación adicional de las columnas de Swing.
+
+Los algoritmos están previstos para el volumen acotado del prototipo: la consulta carga la lista autorizada completa y la inserción tiene costo cuadrático en el peor caso. No se afirma rendimiento de producción.
+
+La revisión se prepara en la rama **local `tp4`**, partiendo de `6e84a3c`. El enlace remoto de `master` conserva la entrega anterior; el incremento TP4 no está publicado.
+
+El contenido versionable se limita al código Java y SQL, la configuración de ejemplo, los archivos necesarios para abrir y compilar el proyecto, los diagramas y las evidencias. Los informes académicos, sus PDF y documentos Word, el guion y los archivos de los TP se conservan únicamente como material local y están excluidos de Git.
 
 ## Requisitos
 
@@ -86,6 +101,8 @@ mvn compile exec:java "-Dexec.cleanupDaemonThreads=false"
 
 Se abre la ventana de acceso. Para detener la ejecución desde la terminal, usar **Ctrl+C**. También puede iniciarse `ar.edu.gestiontecnica.Main` desde el IDE.
 
+La ventana de acceso se centra en el monitor donde está el cursor al iniciarse. Para abrirla en la pantalla de la terminal, dejar el cursor sobre ese monitor hasta que aparezca. Al ingresar o cerrar sesión, la siguiente ventana conserva el monitor de la anterior.
+
 La aplicación lee `config/db.properties` desde el directorio de trabajo. Una ubicación alternativa puede indicarse con `-Dgt.config=/ruta/db.properties`.
 
 ## Cuentas de demostración
@@ -109,28 +126,16 @@ La aplicación lee `config/db.properties` desde el directorio de trabajo. Una ub
 
 Las fechas se ingresan como `dd/MM/aaaa HH:mm`. Para registrar una visita realizada, utilizar una fecha anterior o igual al momento actual; no se permite finalizar una visita futura. Diagnóstico y tareas se guardan mediante sus acciones separadas.
 
-## Comprobaciones existentes
+## Verificación del prototipo
 
-No se agregaron nuevas pruebas para esta revisión. Las credenciales de la comprobación de integración existente se actualizaron a `1234`.
-
-Unitarias, sin MySQL:
+Compilar y generar el archivo de la aplicación:
 
 ```bash
-mvn test
+mvn clean package
 ```
 
-Este objetivo ejecuta `PruebasUnitarias`, un programa de 28 comprobaciones explícitas sin JUnit.
+El repositorio conserva capturas del programa conectado con MySQL, con datos ficticios, búsqueda de solicitudes e historial de las asistencias.
 
-Integración, con una base de práctica preparada:
+`sql/04_operaciones_y_consultas.sql` contiene Q01-Q10. Q01-Q03 insertan, modifican y eliminan solamente un cliente temporal sin relaciones; las demás consultas recuperan información del circuito.
 
-```bash
-mvn test-compile exec:java "-Dexec.mainClass=ar.edu.gestiontecnica.PruebasIntegracion" "-Dexec.classpathScope=test" "-Dexec.args=--confirmar-base-pruebas"
-```
-
-La integración agrega solicitudes identificadas como `PRUEBA_TP2` y conserva sus historiales. Esa marca pertenece al programa existente. Ejecutarla únicamente en la base de práctica.
-
-`sql/04_operaciones_y_consultas.sql` contiene Q01-Q10. Q01-Q03 insertan, modifican y eliminan solamente un cliente temporal sin relaciones; las demás consultas recuperan información del circuito. `sql/05_pruebas_integridad.sql` contiene cinco bloques negativos: ejecutarlos individualmente, incluyendo cada `ROLLBACK`.
-
-`PruebasInterfaz` realiza tres comprobaciones de construcción de ventanas; requiere entorno gráfico y no sustituye los recorridos completos con MySQL.
-
-**Verificación local registrada:** 28 comprobaciones unitarias, 17 de integración y cinco de integridad aprobadas; Q01-Q10 ejecutadas. Después del cambio de contraseña se verificó el acceso de las seis cuentas con `1234`. Los procedimientos PP01-PP03 siguen pendientes de ejecución íntegra desde los formularios; las consultas y validaciones gráficas parciales no equivalen a su aprobación.
+Las capturas de `evidencias/tp4/` muestran consultas, búsqueda e historial. Los recorridos manuales completos desde los formularios, la aceptación con usuarios y las mediciones de carga permanecen pendientes.

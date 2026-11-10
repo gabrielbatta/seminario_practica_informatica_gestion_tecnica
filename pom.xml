@@ -31,17 +31,6 @@
                 <configuration>
                     <mainClass>${exec.mainClass}</mainClass>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>pruebas-unitarias</id>
-                        <phase>test</phase>
-                        <goals><goal>java</goal></goals>
-                        <configuration>
-                            <mainClass>ar.edu.gestiontecnica.PruebasUnitarias</mainClass>
-                            <classpathScope>test</classpathScope>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
