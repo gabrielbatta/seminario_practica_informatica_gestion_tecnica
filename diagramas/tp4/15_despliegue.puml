@@ -1,0 +1,28 @@
+@startuml 15_despliegue
+!pragma layout smetana
+left to right direction
+skinparam backgroundColor white
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 16
+skinparam dpi 200
+skinparam roundcorner 0
+skinparam nodesep 16
+skinparam ranksep 16
+skinparam ArrowColor #555555
+skinparam NodeBorderColor #555555
+skinparam NodeBackgroundColor #F5F5F5
+skinparam ArtifactBorderColor #9C9C9C
+skinparam ArtifactBackgroundColor #FFFFFF
+
+node "Estación local · macOS" as Equipo <<device>> {
+  node "JVM · Java 21" as JVM {
+    artifact "Aplicación Swing\nJDBC Connector/J" as App
+  }
+  node "MySQL 9.6.0" as MySQL {
+    artifact "gestion_tecnica" as BD <<database>>
+  }
+  JVM --> MySQL : "MySQL + TLS\n127.0.0.1:3306 (TCP)"
+}
+@enduml

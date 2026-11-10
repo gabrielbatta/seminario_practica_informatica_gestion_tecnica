@@ -1,0 +1,76 @@
+@startuml 12_modelo_y_excepciones
+!pragma layout smetana
+skinparam monochrome true
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam dpi 160
+skinparam classAttributeIconSize 0
+hide circle
+abstract class RegistroAtencion {
+ -id: int
+ -estado: String
+ -cliente: String
+ -servicio: String
+ {abstract} +getReferencia(): String
+}
+class Solicitud {
+ -servicioId: int
+ -usuarioRegistroId: int
+ -fechaRegistro: LocalDateTime
+ -descripcion: String
+ -fechaCierre: LocalDateTime
+ -canalCierre: String
+ -solucionCierre: String
+ -domicilio: String
+ +getReferencia(): String
+}
+class Asistencia {
+ -solicitudId: int
+ -tecnicoId: Integer
+ -motivo: String
+ -fechaProgramada: LocalDateTime
+ -diagnostico: String
+ -tareas: String
+ -resultado: String
+ -detalleResultado: String
+ -fechaFinalizacion: LocalDateTime
+ -nombreTecnico: String
+ +getReferencia(): String
+}
+class Usuario {
+ -id: int
+ -nombre: String
+ -login: String
+ -claveHash: String
+ -rol: String
+ -activo: boolean
+}
+class Opcion {
+ -id: int {final}
+ -descripcion: String {final}
+ +Opcion(id: int, descripcion: String)
+ +getId(): int
+ +toString(): String
+}
+RegistroAtencion <|-- Solicitud
+RegistroAtencion <|-- Asistencia
+Solicitud "1" .. "0..*" Asistencia : relación por solicitudId
+class IllegalArgumentException <<Java>>
+class ReglaNegocioException {
+ +ReglaNegocioException(mensaje: String)
+}
+class AccesoDenegadoException {
+ +AccesoDenegadoException(mensaje: String)
+}
+IllegalArgumentException <|-- ReglaNegocioException
+ReglaNegocioException <|-- AccesoDenegadoException
+legend bottom
+ + público; - privado; cursiva: abstracto; triángulo vacío: herencia.
+ RegistroAtencion incluye accesores públicos para sus cuatro campos.
+ Los modelos concretos y Usuario conservan sus accesores públicos.
+ cliente y servicio son datos de consulta; no se duplican en las tablas.
+ Se conserva la relación entre una solicitud y sus visitas.
+endlegend
+@enduml

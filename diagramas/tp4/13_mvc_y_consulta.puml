@@ -1,0 +1,28 @@
+@startuml 13_mvc_y_consulta
+!pragma layout smetana
+skinparam monochrome true
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 15
+skinparam dpi 160
+top to bottom direction
+rectangle "Swing: vista y control de eventos\nVentanaLogin / VentanaPrincipal\nEntradas, acciones y presentación" as Interfaz
+rectangle "Servicios: reglas y transacciones\nAutenticacionServicio\nSolicitudServicio / AsistenciaServicio" as Servicios
+rectangle "ConsultaSolicitudes\nBúsqueda secuencial\nArrayList + Solicitud[]\nOrdenación por inserción" as Consulta
+rectangle "Modelo\nRegistroAtencion (abstracta)\nSolicitud / Asistencia\ngetReferencia polimórfico" as Modelo
+rectangle "DAO: persistencia parametrizada\nSolicitudDAO / AsistenciaDAO\nAtencionRemotaDAO / ActividadDAO\nUsuarioDAO / CatalogoDAO" as Datos
+database "MySQL\nConexión JDBC mediante ConexionBD" as Base
+Interfaz -down-> Servicios : invoca operaciones
+Servicios -down-> Datos : consulta y actualiza
+Datos -down-> Base : SQL
+Servicios -right-> Consulta : busca y ordena
+Interfaz -right-> Modelo : presenta referencias
+Datos ..> Modelo : construye objetos
+legend bottom
+ MVC simplificado: vista y control de eventos comparten clases Swing.
+ Los servicios aplican ReglasAtencion y controlan commit / rollback.
+ Los DAO filtran los registros autorizados antes de la búsqueda Java.
+ Los rectángulos agrupan responsabilidades; no son clases adicionales.
+endlegend
+@enduml

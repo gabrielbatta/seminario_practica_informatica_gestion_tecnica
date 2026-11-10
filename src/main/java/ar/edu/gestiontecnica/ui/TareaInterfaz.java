@@ -1,5 +1,6 @@
 package ar.edu.gestiontecnica.ui;
 
+import ar.edu.gestiontecnica.servicio.ReglaNegocioException;
 import java.awt.Window;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JOptionPane;
@@ -39,7 +40,7 @@ public abstract class TareaInterfaz extends SwingWorker<Void, Void> {
         } catch (ExecutionException error) {
             alFallar();
             Throwable causa = error.getCause();
-            if (causa instanceof IllegalArgumentException) {
+            if (causa instanceof ReglaNegocioException) {
                 JOptionPane.showMessageDialog(ventana, causa.getMessage(), "Revisar datos", JOptionPane.WARNING_MESSAGE);
             } else {
                 causa.printStackTrace();

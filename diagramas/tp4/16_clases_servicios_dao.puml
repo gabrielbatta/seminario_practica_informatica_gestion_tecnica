@@ -1,0 +1,100 @@
+@startuml 16_clases_servicios_dao
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam classFontSize 15
+skinparam classAttributeIconSize 0
+skinparam dpi 220
+skinparam roundcorner 0
+skinparam nodesep 28
+skinparam ranksep 30
+skinparam ArrowColor #6D6D6D
+skinparam classBorderColor #6D6D6D
+skinparam classBackgroundColor #FAFAFA
+skinparam classBackgroundColor<<contexto>> #FFFFFF
+skinparam classBorderColor<<contexto>> #989898
+skinparam packageBorderColor #AFAFAF
+skinparam packageBackgroundColor white
+hide circle
+hide empty fields
+class SolicitudServicio {
+  -solicitudDAO : SolicitudDAO {final}
+  -asistenciaDAO : AsistenciaDAO {final}
+  -remotaDAO : AtencionRemotaDAO {final}
+  -actividadDAO : ActividadDAO {final}
+  -catalogoDAO : CatalogoDAO {final}
+  --
+  +registrar(Usuario, int, String) : int
+  +registrarAtencionRemota(Usuario, int, …) : void
+  +derivar(Usuario, int, String) : int
+  +listar(Usuario, String) : List<Solicitud>
+}
+class AsistenciaServicio {
+  -asistenciaDAO : AsistenciaDAO {final}
+  -solicitudDAO : SolicitudDAO {final}
+  -actividadDAO : ActividadDAO {final}
+  --
+  +programar(Usuario, int, LocalDateTime) : void
+  +asignarTecnico(Usuario, int, int) : void
+  +finalizar(Usuario, int, …) : void
+}
+class AutenticacionServicio {
+  +ingresar(String, char[]) : Usuario
+}
+class SolicitudDAO {
+  +insertar(Connection, …) : int
+  +buscar(Connection, …) : Solicitud
+  +cerrar(Connection, …) : void
+}
+class AsistenciaDAO {
+  +insertar(Connection, …) : int
+  +buscar(Connection, …) : Asistencia
+  +finalizar(Connection, …) : void
+}
+class AtencionRemotaDAO {
+  +insertar(Connection, …) : void
+}
+class ActividadDAO {
+  +registrar(Connection, …) : void
+  +consultarHistorialServicio(Connection, …) : String
+}
+class CatalogoDAO {
+  +listarServicios(Connection) : List<Opcion>
+  +listarTecnicos(Connection) : List<Opcion>
+}
+class UsuarioDAO {
+  +buscarPorLogin(Connection, …) : Usuario
+  +buscarPorId(Connection, …) : Usuario
+}
+
+SolicitudServicio --> SolicitudDAO
+SolicitudServicio --> AsistenciaDAO
+SolicitudServicio --> AtencionRemotaDAO
+SolicitudServicio --> ActividadDAO
+SolicitudServicio --> CatalogoDAO
+AsistenciaServicio --> AsistenciaDAO
+AsistenciaServicio --> SolicitudDAO
+AsistenciaServicio --> ActividadDAO
+AsistenciaServicio ..> UsuarioDAO
+AsistenciaServicio ..> CatalogoDAO
+AutenticacionServicio ..> UsuarioDAO
+SolicitudServicio -[hidden]right- AsistenciaServicio
+AsistenciaServicio -[hidden]right- AutenticacionServicio
+SolicitudDAO -[hidden]right- AsistenciaDAO
+AsistenciaDAO -[hidden]right- AtencionRemotaDAO
+ActividadDAO -[hidden]right- CatalogoDAO
+CatalogoDAO -[hidden]right- UsuarioDAO
+SolicitudDAO -[hidden]down- ActividadDAO
+AsistenciaDAO -[hidden]down- CatalogoDAO
+AtencionRemotaDAO -[hidden]down- UsuarioDAO
+
+legend bottom
+ + público; - privado; {final}: referencia no reasignable.
+ Se muestran todos los atributos de los servicios y métodos representativos.
+ Los DAO reciben Connection; los servicios coordinan commit y rollback.
+ … indica parámetros abreviados, no atributos omitidos.
+endlegend
+@enduml

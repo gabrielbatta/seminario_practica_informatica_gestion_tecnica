@@ -9,56 +9,56 @@ import java.time.LocalDateTime;
 public class ReglasAtencion {
     public static String textoObligatorio(String texto, String campo, int longitudMaxima) {
         if (texto == null || texto.trim().isEmpty()) {
-            throw new IllegalArgumentException("Completar " + campo + ".");
+            throw new ReglaNegocioException("Completar " + campo + ".");
         }
         String limpio = texto.trim();
         if (limpio.length() > longitudMaxima) {
-            throw new IllegalArgumentException(campo + ": máximo " + longitudMaxima + " caracteres.");
+            throw new ReglaNegocioException(campo + ": máximo " + longitudMaxima + " caracteres.");
         }
         return limpio;
     }
 
     public static void validarRol(Usuario usuario, String... rolesPermitidos) {
         if (usuario == null || !usuario.getActivo()) {
-            throw new IllegalArgumentException("Se requiere una sesión activa.");
+            throw new AccesoDenegadoException("Se requiere una sesión activa.");
         }
         for (String rol : rolesPermitidos) {
             if (rol.equals(usuario.getRol())) { return; }
         }
-        throw new IllegalArgumentException("Su rol no permite realizar esta operación.");
+        throw new AccesoDenegadoException("Su rol no permite realizar esta operación.");
     }
 
     public static void validarSolicitudAbierta(Solicitud solicitud) {
-        if (solicitud == null) { throw new IllegalArgumentException("La solicitud no existe."); }
+        if (solicitud == null) { throw new ReglaNegocioException("La solicitud no existe."); }
         if ("CERRADA".equals(solicitud.getEstado())) {
-            throw new IllegalArgumentException("La solicitud está cerrada; se conserva solo para consulta.");
+            throw new ReglaNegocioException("La solicitud está cerrada; se conserva solo para consulta.");
         }
     }
 
     public static void validarAtencionRemota(Solicitud solicitud, boolean tieneVisitaActiva) {
         validarSolicitudAbierta(solicitud);
         if (tieneVisitaActiva || "DERIVADA".equals(solicitud.getEstado())) {
-            throw new IllegalArgumentException("Debe finalizar la visita activa antes de continuar remotamente.");
+            throw new ReglaNegocioException("Debe finalizar la visita activa antes de continuar remotamente.");
         }
     }
 
     public static void validarDerivacion(Solicitud solicitud, boolean tieneVisitaActiva) {
         validarSolicitudAbierta(solicitud);
         if (tieneVisitaActiva) {
-            throw new IllegalArgumentException("La solicitud ya tiene una asistencia sin finalizar.");
+            throw new ReglaNegocioException("La solicitud ya tiene una asistencia sin finalizar.");
         }
     }
 
     public static void validarResultado(String resultado) {
         if (!"RESUELTO".equals(resultado) && !"PENDIENTE".equals(resultado)) {
-            throw new IllegalArgumentException("Seleccionar RESUELTO o PENDIENTE.");
+            throw new ReglaNegocioException("Seleccionar RESUELTO o PENDIENTE.");
         }
     }
 
     public static void validarAsistenciaEditable(Asistencia asistencia) {
-        if (asistencia == null) { throw new IllegalArgumentException("La asistencia no existe."); }
+        if (asistencia == null) { throw new ReglaNegocioException("La asistencia no existe."); }
         if ("FINALIZADA".equals(asistencia.getEstado())) {
-            throw new IllegalArgumentException("La asistencia ya fue finalizada y no puede modificarse.");
+            throw new ReglaNegocioException("La asistencia ya fue finalizada y no puede modificarse.");
         }
     }
 
@@ -71,10 +71,10 @@ public class ReglasAtencion {
         validarRol(usuario, "TECNICO");
         validarAsistenciaEditable(asistencia);
         if (!"PROGRAMADA".equals(asistencia.getEstado())) {
-            throw new IllegalArgumentException("La asistencia debe tener fecha y técnico asignados.");
+            throw new ReglaNegocioException("La asistencia debe tener fecha y técnico asignados.");
         }
         if (asistencia.getTecnicoId() == null || asistencia.getTecnicoId() != usuario.getId()) {
-            throw new IllegalArgumentException("Solo el técnico asignado puede registrar esta intervención.");
+            throw new AccesoDenegadoException("Solo el técnico asignado puede registrar esta intervención.");
         }
     }
 
@@ -86,7 +86,7 @@ public class ReglasAtencion {
         textoObligatorio(detalle, "el detalle del resultado", 2000);
         validarResultado(resultado);
         if (asistencia.getFechaProgramada().isAfter(ahora)) {
-            throw new IllegalArgumentException("No se puede finalizar una visita programada para el futuro.");
+            throw new ReglaNegocioException("No se puede finalizar una visita programada para el futuro.");
         }
     }
 }
